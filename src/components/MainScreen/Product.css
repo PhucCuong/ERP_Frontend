@@ -1,0 +1,144 @@
+.product-container {
+    background-color: red;
+    height: 100%;
+    background-color: #E4E7F2;
+}
+.header {
+    background-color: #509AFF;
+    height: 84px;
+    color: white;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    padding-left: 100px;
+}
+
+.body {
+    
+    display: flex;
+    flex-direction: row;
+}
+
+.product-list {
+    background-color: #fff;
+    width: 351px;
+    height: 769px;
+    margin-left: 16px;
+    text-align: left;
+}
+
+.product-detail {
+    height: 100%;
+    display: flex;
+    flex: 1;
+    background-color: #fff;
+    margin-left: 16px;
+    height: 100vh;
+    border-left: 2px solid #509AFF;
+}
+
+.create-new-product-btn {
+    width: 125px;
+    height: 50px;
+    background-color: #1FA9FD;
+    border-width: 0px;
+    color: #fff;
+    font-size: 24px;
+    font-weight: 400;
+    margin-top: 16px;
+    margin-left: 8px;
+}
+
+.product-title-row {
+    display: flex;
+    flex-direction: row;
+    margin-top: 37px;
+}
+
+.product-list-title {
+    width: 175px;
+    height: 77px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #3E58CE;
+    font-size: 20px;
+    color: #fff;
+
+}
+
+.product-list-title-left {
+    border-right: 1px solid #fff;
+}
+
+.product-list-title-right {
+    border-left: 1px solid #fff;
+}
+
+.product-list-columns {
+    height: 580px;
+    overflow-y: hidden;
+}
+
+.product-1-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding-left: 8px;
+    padding-right: 8px;
+    height: 80px;
+    align-items: center;
+    border-bottom: 2px solid #3E58CE;
+}
+
+.product-name-detail-row {
+    display: flex;
+    flex-direction: row;
+    margin-top: 60px;
+    margin-left: 67px;
+    height: 30px;
+    align-items: center;
+}
+
+.product-name-detail-label {
+    font-size: 24px;
+    color: #000000
+}
+
+.product-name-detail {
+    font-size: 24px;
+    color: #1FA9FD;
+    margin-left: 16px;
+}
+
+.product-detail-image-label {
+    margin-top: 48px;
+    text-align: left;
+    margin-left: 67px;
+    font-size: 24px;
+}
+
+.product-detail-row {
+    display: flex;
+    flex-direction: row;
+    margin-left: 67px;
+    margin-top: 17px;
+    font-size: 20px;
+    font-weight: 300;
+    color: #000000;
+    font-weight: 400;
+}
+
+.product-detail-value {
+    font-size: 20px;
+    color: #1FA9FD;
+    margin-left: 40px;
+    font-weight: bold;
+}
+
+.product-detail-description {
+    font-weight: 400;
+    color: #000000 ;
+    margin-left: 40px;
+    font-size: 20px;
+}
