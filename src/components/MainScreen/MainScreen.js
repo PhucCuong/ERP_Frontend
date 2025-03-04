@@ -9,6 +9,9 @@ import Scrap from './Scrap'
 import Productionprocess from './Productionprocess'
 import Workcenters from './Workcenters'
 import Reportings from './Reportings'
+import CreateProduct from './CreateProduct'
+import ManfacturingDetail from './ManfacturingDetail'
+import RawMaterials from './RawMaterials'
 const MainScreen = () => {
     return (
         <div className='mainscreen_container'>
@@ -16,6 +19,7 @@ const MainScreen = () => {
                 <Route path="/" element={<Navigate to="/bom" />} />
 
                 <Route path="/bom" element={<Bom />} />
+                <Route path="/raw-materials" element={<RawMaterials />} />
                 <Route path="/products" element={<Products />} />
                 <Route path="/manfacturingorders" element={<Manfacturingorders />} />
                 <Route path="/workorders" element={<Workorders />} />
@@ -24,6 +28,8 @@ const MainScreen = () => {
                 <Route path="/productionprocess" element={<Productionprocess />} />
                 <Route path="/workcenters" element={<Workcenters />} />
                 <Route path="/reportings" element={<Reportings />} />
+                <Route path="/products/create" element={<CreateProduct />} />
+                <Route path="/manfacturing/detail" element={<ManfacturingDetail />} />
             </Routes>
         </div>
     )

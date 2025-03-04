@@ -1,0 +1,74 @@
+.bold {
+    font-weight: bold;
+}
+.red-color {
+    color: #FB0000;
+}
+.primary-color {
+    color : #3348A9
+}
+.green-color {
+    color: #85925A
+}
+.manfacturing-detail-close-button {
+    border-width: 0px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: calc(100% - 40px);
+    background-color: #E4E7F2;
+}
+
+.manfacturing-detail-close-icon {
+    width: 40px;
+    height: 40px;
+}
+
+.manfacturing-detail-info {
+    width: 90%;
+    margin: auto;
+    display: flex;
+    flex-direction: row;
+}
+
+.manfacturing-detail-column {
+    width: 50%;
+}
+
+.man-det-info-row {
+    display: flex;
+    flex-direction: row;
+    margin-left: 60px;
+    margin-top: 30px;
+    justify-content: space-between;
+}
+
+.man-det-info-value {
+    margin-right: 350px;
+    font-weight: 600;
+}
+
+.man-det-table {
+    overflow: hidden;
+    border-collapse: collapse;
+    width: 90%;
+    margin: auto;
+    margin-top: 30px;
+}
+
+.man-det-table-title {
+    background-color: #3E58CE;
+}
+
+.man-det-th {
+    height: 40px;
+    color: #fff;
+    font-weight: 500;
+}
+
+.man-det-td {
+    height: 42px;
+    font-weight: 400;
+}

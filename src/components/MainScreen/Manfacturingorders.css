@@ -1,0 +1,81 @@
+.manfactring-button-row {
+    height: 60px;
+}
+
+.manfactring-button-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.manfacturing-new-button {
+    background-color: #1FA9FD;
+    width: 105px;
+    height: 40px;
+    border: 0px;
+    outline: none;
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: bold;
+    margin-left: 20px;
+}
+
+.manfacturing-filter-input {
+    width: 410px;
+    height: 30px;
+    border: 1px solid #1FA9FD;
+    outline: none;
+    margin-left: 140px;
+}
+
+.manfacturing-search-button {
+    width: 35px;
+    height: 35px;
+    background-color: #1FA9FD;
+    border-width: 0px;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 30px;
+}
+
+.manfacturing-select {
+    width: 120px;
+    height: 40px;
+    padding-left: 20px;
+    color: #fff;
+    background-color: #1FA9FD;
+    border-width: 0px;
+    font-weight: bold;
+    margin-left: 30px;
+    outline: none;
+}
+
+.manfacturing-table {
+    width: 90%;
+    margin: auto;
+    
+    margin-top: 20px;
+    overflow: hidden;
+    border-collapse: collapse
+}
+
+.manfacturing-table-title {
+    background-color: #3E58CE;
+    color: #fff;
+    /* height: 40px;  */
+}
+
+.manfacturing-row {
+    font-weight: 500;
+}
+
+td, th {
+    height: 8vh;
+}
+
+.blue-color {
+    color: #1FA9FD;
+}
+  

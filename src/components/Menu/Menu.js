@@ -9,16 +9,12 @@ import { IoTrashBinOutline } from "react-icons/io5";
 import { AiOutlineRetweet } from "react-icons/ai";
 import { RiBuilding2Fill } from "react-icons/ri";
 import { BsReception4 } from "react-icons/bs";
+import { AiOutlineDeploymentUnit } from "react-icons/ai";
 import './Menu.css';
 
 const Menu = () => {
 
     const [page, setPage] = useState('bom')
-    // const [pageNumber, setPageNumber] = useState(0)
-
-    useEffect(() => {
-        console.log(page)
-    }, [page])
 
     return (
         <div className="menu_container">
@@ -57,6 +53,20 @@ const Menu = () => {
                 >
                     <SiMaterialdesignicons/>&emsp;
                     Bill of meterial
+                </NavLink>
+                <NavLink
+                    onClick={() => setPage('raw-materials')}
+                    to="/raw-materials"
+                    className='btn'
+                    style={{
+                        backgroundColor: page === 'raw-materials' ? '#E4E7F2' : '#3E58CE',
+                        color: page === 'raw-materials' ? '#3348A9' : '#ffffff',
+                        fontSize: 18,
+                        textDecoration: 'none',
+                    }}
+                >
+                    <AiOutlineDeploymentUnit />&emsp;
+                    Raw Materials
                 </NavLink>
                 <NavLink
                     onClick={() => setPage('products')}
