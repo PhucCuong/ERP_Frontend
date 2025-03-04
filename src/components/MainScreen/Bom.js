@@ -7,17 +7,17 @@ import axios from 'axios';
 
 
 const Bom = () => {
-    const [productId, setProductId] = useState('')
-    const [bomIndex, setBomIndex] = useState(0)
 
-    // 3 mảng gọi api
+    // 4 mảng gọi api
+    const [productId, setProductId] = useState('')
     const [products, setProducts] = useState([])
     const [materials, setMaterials] = useState([])
     const [boms, setBoms] = useState([])
 
+
     const [bomListDuplicate, setBomListDuplicate] = useState([])  // array trùng lặp tên sản phẩm
 
-    const [bomDetailList, setBomDetailList] = useState([])  // mảng chứa các định mức nguyên vật liệu của 1 Bom cụ thể (bảng của màn hình bên phải)
+    const [bomDetailList, setBomDetailList] = useState([])  // mảng chứa các định mức nguyên vật liệu của 1 Bom cụ thể (BẢNG của màn hình bên phải)
 
     // các biến để hiển thị ra thẻ input bên phải
     const [productName, setProductName] = useState('')
@@ -28,6 +28,10 @@ const Bom = () => {
         axios.get('https://localhost:7135/api/SanPhamx')
             .then(response => {
                 setProducts(response.data)
+                setProductName(response.data[0].tenSanPham)
+                setQuantity(1)
+                setUnit(response.data[0].donViTinh)
+                setProductId(response.data[0].maSanPham)
             })
             .catch(error => {
                 console.error('Lỗi:', error);
@@ -49,7 +53,7 @@ const Bom = () => {
                 console.error('Lỗi:', error);
             });
     }, [])
-
+    console.log(bomDetailList)
     useEffect(() => {
         if (products.length !== 0 && materials.length !== 0 && boms.length !== 0) {
             const mergedData = boms.map(dinhMuc => ({
@@ -60,9 +64,28 @@ const Bom = () => {
             }));
             setBomListDuplicate(mergedData)
         }
-    }, [products, materials, boms])
 
-    // const bomList = [
+        // cho lần mount đầu tiên là định mức nguyên vật liệu của sản phẩm đầu tiên
+        var arr = []
+        products.map(product => 
+        {
+            boms.map(bom => {
+                materials.map(material => {
+                    if (bom.maSanPham === products[0].maSanPham && bom.maNguyenVatLieu === material.maNguyenVatLieu) {
+                        arr.push({
+                            materialCode: material.maNguyenVatLieu,
+                            materialsName: material.tenNguyenVatLieu,
+                            quantity: bom.soLuong
+                        })
+                    }
+                })
+            })
+        }
+        )
+        setBomDetailList(arr)
+    }, [products, materials, boms])
+    
+
     //     {
     //         "maDinhMuc": 1,
     //         "tenSanPham": "Bàn làm việc",
@@ -146,14 +169,24 @@ const Bom = () => {
 
     // hàm nhấn vào một dòng của Bom
     const getBomDetailFromProductCode = (product) => {
-        var arr = bomListDuplicate.filter(item => item.maSanPham === product.productId)
-        setBomDetailList(arr)
         setProductId(product.maSanPham)
         setProductName(product.tenSanPham)
         setQuantity(1)
         setUnit(product.donViTinh)
+        var arr = []
+        boms.map(bom => {
+            materials.map(material => {
+                if (bom.maSanPham === product.maSanPham && bom.maNguyenVatLieu === material.maNguyenVatLieu) {
+                    arr.push({
+                        materialCode: material.maNguyenVatLieu,
+                        materialsName: material.tenNguyenVatLieu,
+                        quantity: bom.soLuong
+                    })
+                }
+            })
+        })
+        setBomDetailList(arr)
     }
-
     return (
         <div className='bom-container'>
             <div className='bom-header'>
@@ -175,7 +208,7 @@ const Bom = () => {
                             {
                                 products.map(item => (
                                     <div className='bom-item-row' onClick={() => getBomDetailFromProductCode(item)}
-                                        style={{ backgroundColor: productId === item.maDinhMuc ? '#C0C0C0' : '#ffffff' }}
+                                        style={{ backgroundColor: productId === item.maSanPham ? '#C0C0C0' : '#ffffff' }}
                                     >
                                         <div>{item.tenSanPham}</div>
                                         <div>{item.donViTinh}</div>
@@ -185,6 +218,8 @@ const Bom = () => {
                         </div>
                     </div>
 
+
+                    {/* bom detail */}
                     <div className='bom-detail'>
                         <div className='bom-detail-title'>Bom Detail</div>
                         <div className='bom-detail-row'>
@@ -209,17 +244,17 @@ const Bom = () => {
                                 <div>Quantity</div>
                             </div>
                             <div>
-                                {/* {
-                                                    bomListDuplicate[bomIndex].nguyenVatLieus.map((item, index) => (
-                                                        <div
-                                                            className='bom-detail-table-row'
-                                                            style={{ backgroundColor: index % 2 !== 0 ? '#EFEFEF' : '#ffffff' }}
-                                                        >
-                                                            <div>{item.tenNguyenVatLieu}</div>
-                                                            <div>{item.soLuong}</div>
-                                                        </div>
-                                                    ))
-                                                } */}
+                                {
+                                    bomDetailList.map((item, index) => (
+                                        <div
+                                            className='bom-detail-table-row'
+                                            style={{ backgroundColor: index % 2 !== 0 ? '#EFEFEF' : '#ffffff' }}
+                                        >
+                                            <div>{item.materialsName}</div>
+                                            <div>{item.quantity}</div>
+                                        </div>
+                                    ))
+                                }
                             </div>
                             <div className='add-line-table'>Add a line</div>
                         </div>

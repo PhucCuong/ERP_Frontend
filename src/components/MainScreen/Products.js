@@ -122,6 +122,7 @@ const Product = () => {
         axios.get('https://localhost:7135/api/SanPhamx')
             .then(response => {
                 setProducts(response.data)
+                setMaSanPham(response.data[0].maSanPham)
             })
             .catch(error => {
                 console.error('Lỗi:', error);
