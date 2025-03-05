@@ -67,11 +67,11 @@ const Bom = () => {
 
         // cho lần mount đầu tiên là định mức nguyên vật liệu của sản phẩm đầu tiên
         var arr = []
-        products.map(product => 
+        products.map((product, index) => 
         {
             boms.map(bom => {
                 materials.map(material => {
-                    if (bom.maSanPham === products[0].maSanPham && bom.maNguyenVatLieu === material.maNguyenVatLieu) {
+                    if (index === 0 && bom.maSanPham === product.maSanPham && bom.maNguyenVatLieu === material.maNguyenVatLieu) {
                         arr.push({
                             materialCode: material.maNguyenVatLieu,
                             materialsName: material.tenNguyenVatLieu,
@@ -80,8 +80,7 @@ const Bom = () => {
                     }
                 })
             })
-        }
-        )
+        })
         setBomDetailList(arr)
     }, [products, materials, boms])
     

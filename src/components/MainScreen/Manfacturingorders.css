@@ -69,6 +69,11 @@
 
 .manfacturing-row {
     font-weight: 500;
+    cursor: pointer;
+}
+
+.manfacturing-row:hover {
+    background-color: #1FA9FD;
 }
 
 td, th {
