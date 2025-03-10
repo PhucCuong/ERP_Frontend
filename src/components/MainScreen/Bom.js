@@ -2,6 +2,7 @@ import './Bom.css'
 import { FaSearch } from "react-icons/fa";
 import { useState, useEffect } from 'react';
 import { FaPencil } from "react-icons/fa6";
+import Spinner from 'react-bootstrap/Spinner';
 
 import axios from 'axios';
 
@@ -14,10 +15,15 @@ const Bom = () => {
     const [materials, setMaterials] = useState([])
     const [boms, setBoms] = useState([])
 
+    const [loading, setLoading] = useState(false);
+
 
     const [bomListDuplicate, setBomListDuplicate] = useState([])  // array trùng lặp tên sản phẩm
 
     const [bomDetailList, setBomDetailList] = useState([])  // mảng chứa các định mức nguyên vật liệu của 1 Bom cụ thể (BẢNG của màn hình bên phải)
+
+    // hover từng dòng
+    const [hoveredRowIndex, setHoveredRowIndex] = useState(null)
 
     // các biến để hiển thị ra thẻ input bên phải
     const [productName, setProductName] = useState('')
@@ -25,6 +31,10 @@ const Bom = () => {
     const [unit, setUnit] = useState('')
 
     useEffect(() => {
+        setLoading(true)
+        setInterval(() => {
+            setLoading(false)
+        }, 300);
         axios.get('https://localhost:7135/api/SanPhamx')
             .then(response => {
                 setProducts(response.data)
@@ -53,7 +63,7 @@ const Bom = () => {
                 console.error('Lỗi:', error);
             });
     }, [])
-    console.log(bomDetailList)
+
     useEffect(() => {
         if (products.length !== 0 && materials.length !== 0 && boms.length !== 0) {
             const mergedData = boms.map(dinhMuc => ({
@@ -67,8 +77,7 @@ const Bom = () => {
 
         // cho lần mount đầu tiên là định mức nguyên vật liệu của sản phẩm đầu tiên
         var arr = []
-        products.map((product, index) => 
-        {
+        products.map((product, index) => {
             boms.map(bom => {
                 materials.map(material => {
                     if (index === 0 && bom.maSanPham === product.maSanPham && bom.maNguyenVatLieu === material.maNguyenVatLieu) {
@@ -83,7 +92,7 @@ const Bom = () => {
         })
         setBomDetailList(arr)
     }, [products, materials, boms])
-    
+
 
     //     {
     //         "maDinhMuc": 1,
@@ -205,9 +214,20 @@ const Bom = () => {
                         </div>
                         <div style={{ overflowY: 'auto', height: 600 }}>
                             {
-                                products.map(item => (
+                                products.map((item, index) => (
                                     <div className='bom-item-row' onClick={() => getBomDetailFromProductCode(item)}
-                                        style={{ backgroundColor: productId === item.maSanPham ? '#C0C0C0' : '#ffffff' }}
+                                        //style={{ backgroundColor: productId === item.maSanPham ? '#C0C0C0' : '#ffffff' }}
+                                        onMouseEnter={() => setHoveredRowIndex(index)}
+                                        onMouseLeave={() => setHoveredRowIndex(null)}
+                                        style={{
+                                            backgroundColor:
+                                                hoveredRowIndex === index
+                                                    ? "#C0C0C0" // Màu khi hover
+                                                    : index % 2 !== 0
+                                                        ? "#D1E8FE" // Màu nền xen kẽ
+                                                        : "#ffffff",
+                                            transition: "background-color 0.3s", // Hiệu ứng mượt mà
+                                        }}
                                     >
                                         <div>{item.tenSanPham}</div>
                                         <div>{item.donViTinh}</div>
@@ -262,9 +282,31 @@ const Bom = () => {
 
                 </div>
             </div>
-            <div></div>
+
+            {loading && <Loading />} {/* Hiển thị Loading khi đang xử lý */}
         </div>
     )
+}
+
+function Loading() {
+    return (
+        <div
+            style={{
+                width: '100%',
+                height: '100vh',
+                backgroundColor: "rgba(0, 0, 0, 0.2)", // Màu nền mờ
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                zIndex: 9999, // Đảm bảo hiển thị trên tất cả
+                position: 'fixed',
+                top: 0,
+                right: 0,
+            }}
+        >
+            <Spinner animation="grow" variant="primary" />
+        </div>
+    );
 }
 
 export default Bom

@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
+import Spinner from 'react-bootstrap/Spinner';
+import { ToastContainer, toast } from 'react-toastify';
 
 
 import './Product.css'
@@ -12,8 +14,16 @@ const Product = () => {
     const [products, setProducts] = useState([])
     const [images, setImages] = useState([])
     const [productList, setProductList] = useState([])
+    const [loading, setLoading] = useState(false);
+
+    // hover từng dòng
+    const [hoveredRowIndex, setHoveredRowIndex] = useState(null);
 
     useEffect(() => {
+        setLoading(true)
+        setInterval(() => {
+            setLoading(false)
+        }, 300);
         callApiGetProducts()
         callApiGetProductImgs()
     }, [])
@@ -118,27 +128,58 @@ const Product = () => {
         navigate("/products/create");
     }
 
-    const callApiGetProducts = () => {
-        axios.get('https://localhost:7135/api/SanPhamx')
-            .then(response => {
-                setProducts(response.data)
-                setMaSanPham(response.data[0].maSanPham)
-            })
-            .catch(error => {
-                console.error('Lỗi:', error);
-            });
-
+    const callApiGetProducts = async () => {
+        // axios.get('https://localhost:7135/api/SanPhamx')
+        //     .then(response => {
+        //         setProducts(response.data)
+        //         setMaSanPham(response.data[0].maSanPham)
+        //     })
+        //     .catch(error => {
+        //         console.error('Lỗi:', error);
+        //     });
+        try {
+            const response = await axios.get("https://localhost:7135/api/SanPhamx");
+            setProducts(response.data);
+            setMaSanPham(response.data[0].maSanPham)
+        } catch (error) {
+            if (axios.isCancel(error)) {
+                console.log("Request canceled", error.message);
+            } else if (error.response && error.response.status === 401) {
+                notify(error.message);
+            } else {
+                console.log("Lỗi kết nối đến server:", error.message);
+                notify("Lỗi kết nối đến server:", error.message);
+            }
+        }
     }
 
-    const callApiGetProductImgs = () => {
-        axios.get('https://localhost:7135/api/SanPhamImgs')
-            .then(response => {
+    const callApiGetProductImgs = async () => {
+        // axios.get('https://localhost:7135/api/SanPhamImgs')
+        //     .then(response => {
+        //         setImages(response.data)
+        //     })
+        //     .catch(error => {
+        //         console.error('Lỗi:', error);
+        //     });
+
+            try {
+                const response = await axios.get("https://localhost:7135/api/SanPhamImgs");
                 setImages(response.data)
-            })
-            .catch(error => {
-                console.error('Lỗi:', error);
-            });
+            } catch (error) {
+                if (axios.isCancel(error)) {
+                    console.log("Request canceled", error.message);
+                } else if (error.response && error.response.status === 401) {
+                    notify(error.message);
+                } else {
+                    console.log("Lỗi kết nối đến server:", error.message);
+                    notify("Lỗi kết nối đến server:", error.message);
+                }
+            }    
     }
+
+    const notify = (message) => toast.info(message, {
+        type: "error"
+    });
 
     return (
         <div className='product-container'>
@@ -155,10 +196,20 @@ const Product = () => {
                     </div>
                     <div className='product-list-columns'>
                         {
-                            productList.map(item => (
+                            productList.map((item, index) => (
                                 <div className='product-1-row'
                                     onClick={() => clickToDetail(item)}
-                                    style={{ backgroundColor: maSanPham === item.maSanPham ? '#C0C0C0' : '#ffffff' }}
+                                    style={{
+                                        backgroundColor:
+                                            hoveredRowIndex === index
+                                                ? "#C0C0C0" // Màu khi hover
+                                                : index % 2 !== 0
+                                                    ? "#D1E8FE" // Màu nền xen kẽ
+                                                    : "#ffffff",
+                                        transition: "background-color 0.3s", // Hiệu ứng mượt mà
+                                    }}
+                                    onMouseEnter={() => setHoveredRowIndex(index)}
+                                    onMouseLeave={() => setHoveredRowIndex(null)}
                                 >
                                     <div>{item.tenSanPham}</div>
                                     <div style={{ color: '#3E58CE' }}>{item.giaBan}</div>
@@ -169,7 +220,7 @@ const Product = () => {
                 </div>
                 <div className='product-detail'>
                     {
-                        productList.map(item => {
+                        productList.map((item, index) => {
                             if (item.maSanPham === maSanPham) {
                                 return (
                                     <div>
@@ -233,8 +284,32 @@ const Product = () => {
                     }
                 </div>
             </div>
+
+            {loading && <Loading />} {/* Hiển thị Loading khi đang xử lý */}
+            <ToastContainer theme="colored" />
         </div>
     )
+}
+
+function Loading() {
+    return (
+        <div
+            style={{
+                width: '100%',
+                height: '100vh',
+                backgroundColor: "rgba(0, 0, 0, 0.2)", // Màu nền mờ
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                zIndex: 9999, // Đảm bảo hiển thị trên tất cả
+                position: 'fixed',
+                top: 0,
+                right: 0,
+            }}
+        >
+            <Spinner animation="grow" variant="primary" />
+        </div>
+    );
 }
 
 export default Product

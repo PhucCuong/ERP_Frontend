@@ -18,8 +18,8 @@ const MainScreen = () => {
             <Routes>
                 <Route path="/" element={<Navigate to="/bom" />} />
 
-                <Route path="/bom" element={<Bom />} />
-                <Route path="/raw-materials" element={<RawMaterials />} />
+                <Route path="bom" element={<Bom />} />
+                <Route path="raw-materials" element={<RawMaterials />} />
                 <Route path="/products" element={<Products />} />
                 <Route path="/manfacturingorders" element={<Manfacturingorders />} />
                 <Route path="/workorders" element={<Workorders />} />
