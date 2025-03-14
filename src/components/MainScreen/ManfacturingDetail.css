@@ -1,5 +1,6 @@
 .bold {
     font-weight: bold;
+    width: 400px;
 }
 .red-color {
     color: #FB0000;
@@ -48,8 +49,9 @@
 }
 
 .man-det-info-value {
-    margin-right: 350px;
+    margin-right: 300px;
     font-weight: 600;
+    width: 500px;
 }
 
 .man-det-table {
@@ -73,6 +75,24 @@
 .man-det-td {
     height: 42px;
     font-weight: 400;
-    color: #1FA9FD;
+}
+
+.add-workorder {
+    color: #3E58CE;
+    text-align: left;
+    width: 1000%;
+    margin: auto;
+    background-color: #96bef7;
+    height: 35px;
+    padding-left: 36px;
+    padding-right: 36px;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.add-workorder:hover {
+    color: #888fb0;
 }
 

@@ -13,27 +13,37 @@ const ManfacturingDetail = () => {
     // list call api
     const [bomList, setBomList] = useState(null)
     const [materials, setMaterials] = useState(null)
+    const [processList, setProcessList] = useState(null)
+    const [productList, setProductList] = useState(null)
 
     // biến để lấy định mức nguyên vật liệu của MỘT sản phẩm đó
     const [components, setComponents] = useState([])
-    console.log(components)
     // nhận tham số truyền vào
     const location = useLocation();
     const item = location.state?.item;
-    //
+
+    // biến lưu lệnh sản xuất từ api về tạm trước khi lọc lại
+    const [workOrderList, setWorkOrderList] = useState([])
+
+    // biến lưu danh sách lệnh sản xuất
+    const [workOrders, setWorkOrders] = useState([])
 
     useEffect(() => {
-        setProductId(item.maSanPham) 
+        setProductId(item.maSanPham)
         callApiGetBomList()
         callApiGetMaterials()
         setComponents([])
+        callApiGetWorkOrders()
+        filterWorkOrder()
+        callApiGetProcessList()
+        callApiGetProductList()
     }, [])
 
     useEffect(() => {
         if (bomList !== null && materials !== null) {
             var mergeData = []
             bomList.map((bom, index) => {
-                if(bom.maSanPham === productId) {
+                if (bom.maSanPham === productId) {
                     mergeData.push({
                         ...bom,
                         tenNguyenVatLieu: materials.find(material => bom.maNguyenVatLieu === material.maNguyenVatLieu)?.tenNguyenVatLieu || null,
@@ -45,64 +55,66 @@ const ManfacturingDetail = () => {
         }
     }, [bomList, materials])
 
+    useEffect(() => {
+        filterWorkOrder(item.maKeHoach)
+    }, [workOrderList])
+
     const callApiGetBomList = () => {
         axios.get('https://localhost:7135/api/DinhMucNguyenVatLieux')
-        .then(response => {
-            setBomList(response.data)
-        })
-        .catch(error => {
-            console.log(error)
-        })
+            .then(response => {
+                setBomList(response.data)
+            })
+            .catch(error => {
+                console.log(error)
+            })
     }
 
     const callApiGetMaterials = () => {
         axios.get('https://localhost:7135/api/NguyenVatLieux')
-        .then(response => {
-            setMaterials(response.data)
-        })
-        .catch(error => {
-            console.log(error)
-        })
+            .then(response => {
+                setMaterials(response.data)
+            })
+            .catch(error => {
+                console.log(error)
+            })
     }
 
-    const workOrders = [
-        {
-            maKeHoach: 'KH1',
-            maLenhLamViec: 'llv1',
-            tenLenhLamViec: 'khoan ốc vít',
-            trangThai: 'Inprogress',
-            khuVucLamViec: 'Xưởng Làm Việc',
-            thoiGianDuKien: '12:00',
-            thoiGianThucTe: '14:00'
-        },
-        {
-            maKeHoach: 'KH1',
-            maLenhLamViec: 'llv2',
-            tenLenhLamViec: 'Cắt gỗ',
-            trangThai: 'Waiting',
-            khuVucLamViec: 'Xưởng Gỗ',
-            thoiGianDuKien: '23:00',
-            thoiGianThucTe: '24:00'
-        },
-        {
-            maKeHoach: 'KH1',
-            maLenhLamViec: 'll32',
-            tenLenhLamViec: 'Lắp Ráp',
-            trangThai: 'Waiting',
-            khuVucLamViec: 'Xưởng Lắp Ráp',
-            thoiGianDuKien: '14:00',
-            thoiGianThucTe: '16:00'
-        },
-        {
-            maKeHoach: 'KH1',
-            maLenhLamViec: 'llv4',
-            tenLenhLamViec: 'Đóng Gói',
-            trangThai: 'Waiting',
-            khuVucLamViec: 'Xưởng Thành Phẩm',
-            thoiGianDuKien: '45:00',
-            thoiGianThucTe: '40:00'
-        },
-    ]
+
+    const callApiGetWorkOrders = () => {
+
+        axios.get('https://localhost:7135/api/LenhSanXuatx')
+            .then(response => {
+                setWorkOrderList(response.data)
+            })
+            .catch(error => {
+                console.log(error)
+            })
+    }
+
+    const callApiGetProcessList = () => {
+        axios.get('https://localhost:7135/api/QuyTrinhSanXuatx')
+            .then(response => {
+                setProcessList(response.data)
+            })
+            .catch(error => {
+                console.log(error)
+            })
+    }
+
+    const callApiGetProductList = () => {
+        axios.get('https://localhost:7135/api/SanPhamx')
+            .then(response => {
+                setProductList(response.data)
+            })
+            .catch(error => {
+                console.log(error)
+            })
+    }
+
+    const filterWorkOrder = (makehoach) => {
+        var list = workOrderList.filter(wo => wo.maKeHoach === makehoach)
+        setWorkOrders(list)
+    }
 
     const clickBackManfacturingOrders = () => {
         navigate('/manfacturingorders')
@@ -112,7 +124,7 @@ const ManfacturingDetail = () => {
         <div>
             <div className="header">View Manfacturing Order</div>
             <button className='manfacturing-detail-close-button' onClick={() => clickBackManfacturingOrders()}>
-                <IoMdClose className='manfacturing-detail-close-icon' />
+                {/* <IoMdClose className='manfacturing-detail-close-icon' /> */}
             </button>
             <div className='manfacturing-detail-info'>
                 <div className='manfacturing-detail-column'>
@@ -129,7 +141,7 @@ const ManfacturingDetail = () => {
                 <div className='manfacturing-detail-column'>
                     <div className='man-det-info-row'>
                         <div className='bold'>Start Date :</div>
-                        <div className='man-det-info-value green-color'>{item.ngayTao.slice(0,10)}</div>
+                        <div className='man-det-info-value green-color'>{item.ngayTao.slice(0, 10)}</div>
                     </div>
                     <div className='man-det-info-row'>
                         <div className='bold'>Responsible :</div>
@@ -154,7 +166,13 @@ const ManfacturingDetail = () => {
                     </div>
                 </div>
             </div>
-
+            <div style={{
+                fontSize: 23,
+                textAlign: 'left',
+                marginLeft: 70,
+                marginTop: 20,
+                color: '#18A2B8'
+            }}>Bill of material :</div>
             <table className='man-det-table'>
                 <thead>
                     <tr className='man-det-table-title'>
@@ -168,40 +186,93 @@ const ManfacturingDetail = () => {
                     {
                         components.map((nvl, index) => (
                             <tr style={{ backgroundColor: index % 2 !== 0 ? '#EFEFEF' : '#FFFFFF' }}>
-                                <td className='man-det-td' style={{fontWeight: 600, color: '#3348A9'}}>{nvl.tenNguyenVatLieu}</td>
-                                <td className='man-det-td' style={{fontSize: 22}}>{nvl.soLuong}</td>
-                                <td className='man-det-td' style={{fontSize: 22}}>{nvl.donViTinh}</td>
+                                <td className='man-det-td' style={{ fontWeight: 600, color: '#3348A9' }}>{nvl.tenNguyenVatLieu}</td>
+                                <td className='man-det-td' style={{ fontSize: 20 }}>{nvl.soLuong}</td>
+                                <td className='man-det-td' style={{ fontSize: 20 }}>{nvl.donViTinh}</td>
                             </tr>
                         ))
                     }
                 </tbody>
             </table>
 
+            <div style={{
+                fontSize: 23,
+                textAlign: 'left',
+                marginLeft: 70,
+                marginTop: 20,
+                color: '#18A2B8'
+            }}>Work orders :</div>
             <table className='man-det-table'>
                 <thead>
                     <tr className='man-det-table-title'>
-                        <th className='man-det-th'>Work Orders</th>
-                        <th className='man-det-th'>Work Center</th>
-                        <th className='man-det-th'>Start Date</th>
-                        <th className='man-det-th'>Expect Duration</th>
-                        <th className='man-det-th'>Real Duration</th>
+                        <th className='man-det-th'>Work Orders Code</th>
+                        <th className='man-det-th'>Plan Code</th>
+                        <th className='man-det-th'>Process</th>
+                        <th className='man-det-th'>Product</th>
+                        <th className='man-det-th'>Quantity</th>
+                        <th className='man-det-th'>Start date</th>
+                        <th className='man-det-th'>End date</th>
+                        <th className='man-det-th'>Real duration</th>
+                        <th className='man-det-th'>Manufacturing Supervisor</th>
                         <th className='man-det-th'>Status</th>
                     </tr>
                 </thead>
 
                 <tbody>
                     {
-                        workOrders.map((llv, index) => (
-                            <tr style={{ backgroundColor: index % 2 !== 0 ? '#EFEFEF' : '#FFFFFF' }}>
-                                <td className='man-det-td' >{llv.tenLenhLamViec}</td>
-                                <td className='man-det-td' >{llv.khuVucLamViec}</td>
-                                <td className='man-det-td' ></td>
-                                <td className='man-det-td' >{llv.thoiGianDuKien}</td>
-                                <td className='man-det-td' >{llv.thoiGianThucTe}</td>
-                                <td className='man-det-td' >{llv.trangThai}</td>
-                            </tr>
-                        ))
+                        workOrders.map((llv, index) => {
+                            return (
+                                <tr style={{ backgroundColor: index % 2 !== 0 ? '#EFEFEF' : '#FFFFFF' }}>
+                                    <td title={llv.maLenh} style={{ width: 150, cursor: 'pointer', color: '#3E58CE' }} className='man-det-td' >{llv.maLenh.slice(0, 13)}...</td>
+                                    <td title={llv.maKeHoach} style={{ width: 150, cursor: 'pointer', color: '#3E58CE' }} className='man-det-td' >{llv.maKeHoach.slice(0, 13)}...</td>
+                                    <td className='man-det-td' style={{ width: 150 }}>
+                                        {(() => {
+                                            if (processList !== null) {
+                                                var object = processList.filter(p => p.maQuyTrinh === llv.maQuyTrinh)[0];
+                                                return object ? object.tenQuyTrinh : "";
+                                            }
+                                        })()}
+                                    </td>
+
+                                    <td className='man-det-td' style={{ width: 200 }}>
+                                        {(() => {
+                                            if (productList !== null) {
+                                                var object = productList.filter(p => p.maSanPham === llv.maSanPham)[0];
+                                                return object ? object.tenSanPham : "";
+                                            }
+                                        })()}
+                                    </td>
+                                    <td className='man-det-td' >{llv.soLuong}</td>
+                                    <td className='man-det-td' style={{ width: 100, color: '#FF3399' }}>{llv.ngayBatDau.slice(0, 10)}</td>
+                                    <td className='man-det-td' style={{ width: 100, color: '#FF3399' }}>{llv.ngayKetThuc.slice(0, 10)}</td>
+                                    <td className='man-det-td' ></td>
+                                    <td className='man-det-td' style={{ color: '#18A2B8', fontWeight: 'bold' }}>{llv.nguoiChiuTrachNhiem}</td>
+                                    <td className='man-det-td' ><div
+                                        className='man-det-td'
+                                        style={{
+                                            backgroundColor:
+                                                llv.trangThai === "Ready"
+                                                    ? "#18A2B8"
+                                                    : llv.trangThai === "Inprogress"
+                                                        ? "#FFFF66"
+                                                        : llv.trangThai === "Block"
+                                                            ? "#BB0000"
+                                                            : "transparent", // Màu mặc định nếu không khớp
+                                            color: "white", // Đổi màu chữ để dễ đọc hơn
+                                            fontWeight: "bold", // Làm nổi bật chữ
+                                            textAlign: "center", // Căn giữa nội dung
+                                            width: 50
+                                        }}
+                                    >
+                                        {llv.trangThai}
+                                    </div>
+                                    </td>
+
+                                </tr>
+                            )
+                        })
                     }
+                    <div className='add-workorder'>Add work order</div>
                 </tbody>
             </table>
         </div>

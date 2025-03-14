@@ -281,20 +281,23 @@ const Menu = () => {
                         Work centers
                     </NavLink>
                 )}
-                <NavLink
-                    onClick={() => setPage('reportings')}
-                    to="/reportings"
-                    className='btn-menu'
-                    style={{
-                        backgroundColor: page === 'reportings' ? '#E4E7F2' : '#3E58CE',
-                        color: page === 'reportings' ? '#3348A9' : '#ffffff',
-                        fontSize: 18,
-                        textDecoration: 'none',
-                    }}
-                >
-                    <BsReception4 />&emsp;
-                    Reportings
-                </NavLink>
+
+                {reportRole.includes(user.role) && (
+                    <NavLink
+                        onClick={() => setPage('reportings')}
+                        to="/reportings"
+                        className='btn-menu'
+                        style={{
+                            backgroundColor: page === 'reportings' ? '#E4E7F2' : '#3E58CE',
+                            color: page === 'reportings' ? '#3348A9' : '#ffffff',
+                            fontSize: 18,
+                            textDecoration: 'none',
+                        }}
+                    >
+                        <BsReception4 />&emsp;
+                        Reportings
+                    </NavLink>
+                )}
             </div>
         </div>
     );

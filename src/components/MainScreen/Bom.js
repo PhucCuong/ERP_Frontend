@@ -1,8 +1,10 @@
 import './Bom.css'
 import { FaSearch } from "react-icons/fa";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { FaPencil } from "react-icons/fa6";
 import Spinner from 'react-bootstrap/Spinner';
+import { AiOutlineClose } from "react-icons/ai";
+import { ToastContainer, toast } from 'react-toastify';
 
 import axios from 'axios';
 
@@ -30,12 +32,19 @@ const Bom = () => {
     const [quantity, setQuantity] = useState(0)
     const [unit, setUnit] = useState('')
 
+    // biến để hiện modal thêm nguyên vật liệu
+    const [isOpenModal, setIsOpenModal] = useState(false)
+
     useEffect(() => {
         setLoading(true)
         setInterval(() => {
             setLoading(false)
         }, 300);
-        axios.get('https://localhost:7135/api/SanPhamx')
+        callapi()
+    }, [])
+
+    const callapi = async () => {
+        await axios.get('https://localhost:7135/api/SanPhamx')
             .then(response => {
                 setProducts(response.data)
                 setProductName(response.data[0].tenSanPham)
@@ -47,7 +56,7 @@ const Bom = () => {
                 console.error('Lỗi:', error);
             });
 
-        axios.get('https://localhost:7135/api/NguyenVatLieux')
+        await axios.get('https://localhost:7135/api/NguyenVatLieux')
             .then(response => {
                 setMaterials(response.data)
             })
@@ -55,14 +64,14 @@ const Bom = () => {
                 console.error('Lỗi:', error);
             });
 
-        axios.get('https://localhost:7135/api/DinhMucNguyenVatLieux')
+        await axios.get('https://localhost:7135/api/DinhMucNguyenVatLieux')
             .then(response => {
                 setBoms(response.data)
             })
             .catch(error => {
                 console.error('Lỗi:', error);
             });
-    }, [])
+    }
 
     useEffect(() => {
         if (products.length !== 0 && materials.length !== 0 && boms.length !== 0) {
@@ -82,6 +91,7 @@ const Bom = () => {
                 materials.map(material => {
                     if (index === 0 && bom.maSanPham === product.maSanPham && bom.maNguyenVatLieu === material.maNguyenVatLieu) {
                         arr.push({
+                            bomCode: bom.maDinhMuc,
                             materialCode: material.maNguyenVatLieu,
                             materialsName: material.tenNguyenVatLieu,
                             quantity: bom.soLuong
@@ -186,6 +196,7 @@ const Bom = () => {
             materials.map(material => {
                 if (bom.maSanPham === product.maSanPham && bom.maNguyenVatLieu === material.maNguyenVatLieu) {
                     arr.push({
+                        bomCode: bom.maDinhMuc,
                         materialCode: material.maNguyenVatLieu,
                         materialsName: material.tenNguyenVatLieu,
                         quantity: bom.soLuong
@@ -194,6 +205,18 @@ const Bom = () => {
             })
         })
         setBomDetailList(arr)
+    }
+
+    const deleteMaterialOfBom = async (bomid) => {
+        console.log(bomid)
+        await axios.delete(`https://localhost:7135/api/DinhMucNguyenVatLieux/${bomid}`)
+        .then(response => {
+            notify_success('Xóa thành công.')
+            callapi()
+        })
+        .catch(error => {
+            notify_error('Xóa thất bại : ', error.message)
+        })
     }
     return (
         <div className='bom-container'>
@@ -261,29 +284,218 @@ const Bom = () => {
                             <div className='bom-detail-table-title'>
                                 <div>Component</div>
                                 <div>Quantity</div>
+                                <div>Action</div>
                             </div>
-                            <div>
+                            <div className='tableBody'>
                                 {
                                     bomDetailList.map((item, index) => (
                                         <div
                                             className='bom-detail-table-row'
-                                            style={{ backgroundColor: index % 2 !== 0 ? '#EFEFEF' : '#ffffff' }}
+                                            style={{ backgroundColor: index % 2 !== 0 ? '#EFEFEF' : '#ffffff'}}
                                         >
                                             <div>{item.materialsName}</div>
-                                            <div>{item.quantity}</div>
+                                            <div style={{marginLeft: 40}}>{item.quantity}</div>
+                                            <button className='delete-row' onClick={() => deleteMaterialOfBom(item.bomCode)}><AiOutlineClose /></button>
                                         </div>
                                     ))
                                 }
                             </div>
-                            <div className='add-line-table'>Add a line</div>
+                            <div className='add-line-table' onClick={() => setIsOpenModal(true)}>Add a line</div>
                         </div>
-                        <button className='bom-detail-save-button'>Save</button>
+
+                        {isOpenModal && <ModalAddMaterial setIsOpenModal={setIsOpenModal} productId={productId} setLoading={setLoading} callapi={callapi} />}
                     </div>
 
                 </div>
             </div>
 
             {loading && <Loading />} {/* Hiển thị Loading khi đang xử lý */}
+            <ToastContainer theme="colored" />
+        </div>
+    )
+}
+
+const notify_success = (message) => toast.info(message, {
+    type: "success"
+});
+
+const notify_error = (message) => toast.info(message, {
+    type: "error"
+});
+
+const ModalAddMaterial = ({ setIsOpenModal, productId, setLoading, callapi }) => {
+
+    const quantityRef = useRef(null)
+
+    const [selectedValue, setSelectedValue] = useState("");
+
+    // biến lưu danh sách NVL render ra thẻ select
+    const [materialList, setMaterialList] = useState([])
+
+    const [hoverSaveButton, setHoverSaveButton] = useState(false)
+
+    useEffect(() => {
+        axios.get('https://localhost:7135/api/NguyenVatLieux')
+            .then(response => {
+                setMaterialList(response.data)
+            })
+            .catch(error => {
+                console.log(error.message)
+            })
+    }, [])
+
+    function getFormattedDate() {
+        const now = new Date();
+
+        // Lấy từng phần của ngày giờ
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, "0"); // Tháng bắt đầu từ 0
+        const day = String(now.getDate()).padStart(2, "0");
+        const hours = String(now.getHours()).padStart(2, "0");
+        const minutes = String(now.getMinutes()).padStart(2, "0");
+        const seconds = String(now.getSeconds()).padStart(2, "0");
+
+        // Lấy mili-giây và chuyển thành 7 chữ số thập phân
+        const milliseconds = String(now.getMilliseconds()).padStart(3, "0") + "0000"; // Thêm 4 số 0 để đủ 7 số
+
+        return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}`;
+    }
+
+    const addMaterial = () => {
+        console.log(selectedValue)
+
+        const ngaytao = getFormattedDate()
+        const requestBody = {
+            maSanPham: productId,
+            maNguyenVatLieu: selectedValue,
+            soLuong: quantityRef.current.value,
+            mucDoSuDung: 'Nhiều',
+            ngayTao: ngaytao,
+        }
+
+        axios.post('https://localhost:7135/api/DinhMucNguyenVatLieux', requestBody)
+            .then(response => {
+                setLoading(true)
+                setInterval(() => {
+                    setLoading(false)
+                }, 300);
+                notify_success('thêm thành công.')
+                callapi()
+                setIsOpenModal(false)
+            })
+            .catch(error => {
+                notify_error('Thêm thất bại : ' + error.message)
+            })
+    }
+
+    return (
+        <div
+            className='modal-add'
+            style={{
+                width: '100%',
+                height: '100%',
+                backgroundColor: 'rgba(0,0,0,0.5)',
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center'
+            }}
+        >
+            <div style={{
+                width: '50%',
+                height: '40%',
+                backgroundColor: '#fff',
+                position: 'relative',
+                paddingBottom: 20
+            }}>
+                <button
+                    className='btn-exit'
+                    style={{
+                        position: 'absolute',
+                        top: 0,
+                        height: 30
+                    }}
+                    onClick={() => setIsOpenModal(false)}
+                >
+                    <AiOutlineClose />
+                </button>
+                <div style={{
+                    color: '#3E58CE',
+                    fontWeight: 'bold',
+                    fontSize: 24,
+                    marginTop: 20,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-around',
+                    height: '100%'
+                }}>
+                    <div>Thêm nguyên vật liệu vào Bom</div>
+                    <div style={{
+                        marginTop: 40,
+                        display: 'flex',
+                        justifyContent: 'space-around'
+                    }}>
+                        <label style={{
+                            color: '#000'
+                        }}>
+                            Chọn nguyên vật liệu
+                        </label>
+                        <select value={selectedValue} onChange={(e) => setSelectedValue(e.target.value)}
+                            style={{
+                                width: '50%',
+                                fontSize: 20,
+                                paddingLeft: 20,
+                                paddingRight: 20
+                            }}
+                        >
+                            <option value="">--Chọn--</option>
+                            {
+                                materialList.map((item, index) => (
+                                    <option key={index} value={item.maNguyenVatLieu}>
+                                        {item.tenNguyenVatLieu}
+                                    </option>
+                                ))
+                            }
+                        </select>
+                    </div>
+                    <div
+                        style={{
+                            marginTop: 40,
+                            display: 'flex',
+                            justifyContent: 'space-around'
+                        }}
+                    >
+                        <label style={{
+                            color: '#000'
+                        }}>
+                            Nhập số lượng
+                        </label>
+                        <input
+                            style={{
+                                width: '50%',
+                                paddingLeft: 20,
+                                paddingRight: 20,
+                                fontSize: 20,
+                            }}
+                            ref={quantityRef}
+                        />
+                    </div>
+                    <button
+                        style={{
+                            width: '15%',
+                            marginLeft: '80%',
+                            borderWidth: 0,
+                            backgroundColor: hoverSaveButton ? '#C0C0C0' : '#17A28D',
+                            color: '#fff'
+                        }}
+                        onMouseEnter={() => setHoverSaveButton(true)}
+                        onMouseLeave={() => setHoverSaveButton(false)}
+                        onClick={() => addMaterial()}
+                    >Save</button>
+                </div>
+            </div>
         </div>
     )
 }

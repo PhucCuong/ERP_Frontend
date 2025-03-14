@@ -142,6 +142,12 @@
     left: -230px
 }
 
+.tableBody {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+
 .bom-detail-table-title {
     background-color: #3E58CE;
     width: 80%;
@@ -163,11 +169,33 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    align-items: center;
     height: 50px;
     color: #000000;
     align-items: center;
     padding-left: 36px;
     padding-right: 36px;
+}
+
+.bom-detail-table-row > div {
+    flex: 1; /* Chia đều khoảng cách giữa các cột */
+    text-align:start; /* Căn giữa nội dung theo chiều ngang */
+}
+
+.delete-row {
+    background-color: red;
+    color : #fff;
+    border-width: 0px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 5%;
+    height: 45%;
+    font-size: 20px;
+}
+
+.delete-row:hover {
+    background-color: rgb(99, 19, 19);
 }
 
 .add-line-table {
@@ -176,12 +204,17 @@
     width: 80%;
     margin: auto;
     background-color: #96bef7;
-    height: 55px;
+    height: 40px;
     padding-left: 36px;
     padding-right: 36px;
     display: flex;
     align-items: center;
-    font-size: 12px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.add-line-table:hover {
+    color: #fff;
 }
 
 .bom-detail-save-button {
@@ -193,4 +226,24 @@
     color: #fff;
     margin-top: 70px;
     margin-right: -650px;
+}
+
+.btn-exit {
+    border-width: 0;
+    width: 5%;
+    height: 5%;
+    font-size: 30;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    right: 0;
+    background-color: red;
+    font-size: 30px;
+    color: #fff;
+}
+
+.btn-exit:hover {
+    background-color: rgba(0,0,0,0.4);
 }

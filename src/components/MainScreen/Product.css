@@ -3,6 +3,7 @@
     height: 100%;
     background-color: #E4E7F2;
 }
+
 .product-header {
     background-color: #509AFF;
     height: 84px;
@@ -14,9 +15,9 @@
 }
 
 .body {
-    
     display: flex;
     flex-direction: row;
+    background-color: '#CA9976';
 }
 
 .product-list {
@@ -31,10 +32,9 @@
     height: 100%;
     display: flex;
     flex: 1;
-    background-color: #fff;
     margin-left: 16px;
-    height: 100vh;
-    border-left: 2px solid #509AFF;
+    height: 800px;
+    overflow-x: hidden;
 }
 
 .create-new-product-btn {
@@ -92,13 +92,14 @@
     cursor: pointer;
 }
 
-.product-name-detail-row {
+.product-name-detail-row {  
     display: flex;
     flex-direction: row;
     margin-top: 60px;
     margin-left: 67px;
     height: 30px;
     align-items: center;
+    
 }
 
 .product-name-detail-label {
@@ -107,9 +108,10 @@
 }
 
 .product-name-detail {
-    font-size: 24px;
-    color: #1FA9FD;
-    margin-left: 16px;
+    font-size: 30px;
+    color: #3E58CE;
+    font-weight: bold;
+    margin-top: -50px;
 }
 
 .product-detail-image-label {
@@ -133,13 +135,44 @@
 .product-detail-value {
     font-size: 20px;
     color: #1FA9FD;
-    margin-left: 40px;
     font-weight: bold;
 }
 
 .product-detail-description {
     font-weight: 400;
-    color: #000000 ;
-    margin-left: 40px;
+    color: #A9A9B7;
     font-size: 20px;
+    margin-top: -20px;
+}
+
+.btn-edit {
+    width: 100px;
+    height: 50px;
+    font-weight: bold;
+    cursor: pointer;
+    background-color: #55c2da;
+    border: 0px;
+    color: #fff;
+    font-size: 20px;
+    border-radius: 10px;
+}
+
+.btn-edit:hover {
+    background-color: #2f6d7a;
+}
+
+.btn-delete {
+    width: 100px;
+    height: 50px;
+    font-weight: bold;
+    cursor: pointer;
+    background-color: #f52c2c;
+    border: 0px;
+    color: #fff;
+    font-size: 20px;
+    border-radius: 10px;
+}
+
+.btn-delete:hover {
+    background-color: #721414;
 }

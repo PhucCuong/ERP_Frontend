@@ -17,7 +17,7 @@ const Login = ({ onLogin, onRegister }) => {
         setLoading(true)
         setInterval(() => {
             setLoading(false)
-        }, 1000);
+        }, 2000);
         try {
             const response = await axios.post('https://localhost:7135/SignIn', {
                 UserName: UserName,

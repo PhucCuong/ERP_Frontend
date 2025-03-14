@@ -189,7 +189,7 @@ const Manfacturingorders = () => {
                                 onMouseLeave={() => setHoveredRowIndex(null)}
                                 onDoubleClick={() => doubleClickRow(item)}
                             >
-                                <td>{item.maKeHoach}</td>
+                                <td title={item.maKeHoach}>{item.maKeHoach.slice(0,18)}...</td>
                                 <td className='blue-color'>{item.nguoiTao}</td>
                                 <td>{item.tenSanPham}</td>
                                 <td>{item.soLuong}</td>
