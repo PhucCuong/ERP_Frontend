@@ -37,8 +37,8 @@
 
 .label {
     position: relative;
-    left: -160px;
-    font-size: 24px;
+    left: -115px;
+    font-size: 30px;
     font-weight: 500;
 }
 
@@ -50,32 +50,50 @@
     padding-right: 20px;
     background-color: #DCDCDC;
     border-width: 0px;
+    border-radius: 10px;
 }
 
 .email {
     margin-top: 42px;
 }
 
-.button {
-    width: 135px;
-    height: 46px;
-    border-radius: 0%;
-    margin-top: 35px;
-    border-color: #fff;
-    border-width: 0px;
-}
 
-.login-btn {
-    margin-right: -202px;
-    font-weight: bold;
-    color: #fff;
-    background-color: blue;
+.button-container {
+    display: flex;
+    justify-content: flex-end; /* Đẩy tất cả các nút sang phải */
+    margin-right: 220px;
+    
 }
 
 .register-btn {
-    margin-right: 7px;
+    
     background-color: #fff;
-    border-width: 2px;
     border-color: blue;
     font-weight: bold;
+    color: black;
+    justify-content: center;
+}
+.register-btn:hover {
+    
+    background-color: #2563eb;
+ 
+}
+.login-btn {
+   
+    font-weight: bold;
+    color: #fff;
+    background-color: blue;
+    border-radius: 10px;
+    border: none; 
+    justify-content: center;
+}
+.login-btn:hover {
+    background-color:darkcyan;
+}
+.login-google {
+    margin-left: 300px; 
+    font-weight: bold;
+    background-color: blue;
+    color: white;
+    width: 200px;
 }

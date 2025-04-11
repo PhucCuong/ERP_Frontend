@@ -125,3 +125,67 @@
 .btn-add:hover {
     background-color: #0f3063;
 }
+.materials-detail {
+    flex: 1;
+    background-color: white;
+    margin-left: 20px;
+    max-width: 70%;
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.materials-detail-column {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    width: 48%;
+    align-items: flex-start;
+}
+
+.materials-detail-label {
+    font-size: 18px;
+    font-weight: bold;
+    color: #2373EA;
+    margin-bottom: 8px;
+}
+
+.materials-detail-input {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    background-color: #f0f4f8;
+    border: 2px solid #cbd3da;
+    border-radius: 6px;
+    transition: all 0.3s ease-in-out;
+}
+
+.materials-detail-input:focus {
+    border-color: #2373EA;
+    background-color: #e8f0fe;
+    box-shadow: 0px 0px 6px rgba(35, 115, 234, 0.5);
+    outline: none;
+}
+
+.btn-add {
+    border-width: 0px;
+    height: 50px;
+    width: 160px;
+    margin-left: 630px;
+    background-color: #2373EA;
+    font-size: 16px;
+    color: #fff;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-add:hover {
+    background-color: #0f3063;
+    box-shadow: 0px 4px 8px rgba(15, 48, 99, 0.3);
+}

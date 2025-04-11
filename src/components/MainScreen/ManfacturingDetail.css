@@ -23,9 +23,19 @@
 }
 
 .manfacturing-detail-close-icon {
-    width: 40px;
+    width: 60px;
     height: 40px;
+    margin-bottom: 120px;
+    background-color: rgb(221, 68, 68);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
 }
+
+.manfacturing-detail-close-icon:hover {
+    background-color: rgb(219, 125, 125);
+} 
 
 .manfacturing-detail-info {
     width: 90%;

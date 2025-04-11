@@ -124,7 +124,7 @@ const ManfacturingDetail = () => {
         <div>
             <div className="header">View Manfacturing Order</div>
             <button className='manfacturing-detail-close-button' onClick={() => clickBackManfacturingOrders()}>
-                {/* <IoMdClose className='manfacturing-detail-close-icon' /> */}
+                <IoMdClose className='manfacturing-detail-close-icon' />
             </button>
             <div className='manfacturing-detail-info'>
                 <div className='manfacturing-detail-column'>

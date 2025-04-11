@@ -14,7 +14,7 @@ import './Menu.css';
 
 import { jwtDecode } from 'jwt-decode';
 
-const Menu = () => {
+const Menu = ({setUserName}) => {
 
     const [page, setPage] = useState('bom')
     const [user, setUser] = useState({})
@@ -98,6 +98,7 @@ const Menu = () => {
             };
 
             setUser(info); // In ra để kiểm tra
+            setUserName(info.name)
         } catch (error) {
             console.error("Token không hợp lệ", error);
         }

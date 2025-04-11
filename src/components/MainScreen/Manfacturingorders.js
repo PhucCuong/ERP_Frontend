@@ -135,11 +135,15 @@ const Manfacturingorders = () => {
         navigate('/manfacturing/detail', { state: { item } })
     }
 
+    const clickCreatePlant = () => {
+        navigate("/manfacturingorders/create");
+    }
+
     return (
         <div>
             <div className="product-header">Manfacturing Orders</div>
             <div className="manfactring-button-row">
-                <button className='manfacturing-new-button'>New</button>
+                <button className='manfacturing-new-button' onClick={() => clickCreatePlant()}>New</button>
                 <input className='manfacturing-filter-input' />
                 <button className='manfacturing-search-button'><FaSearch /></button>
                 {/* <select value={selectedValue} onChange={handleChange}> */}

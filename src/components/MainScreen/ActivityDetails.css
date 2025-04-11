@@ -1,0 +1,179 @@
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.modal-content {
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    width: 90%;
+    max-width: 600px; /* Giới hạn chiều rộng */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease-in-out;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    text-align: left;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    transition: border-color 0.3s ease-in-out;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+.tabs {
+    display: flex;
+    border-bottom: 2px solid #ddd;
+    margin-bottom: 15px;
+}
+
+.tab {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    cursor: pointer;
+    border: none;
+    background: none;
+    font-weight: bold;
+    transition: background 0.3s;
+}
+
+.tab.active {
+    background: #007bff;
+    color: #fff;
+    border-radius: 5px 5px 0 0;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.save-button,
+.cancel-button {
+    padding: 10px 15px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.save-button {
+    background: #28a745;
+    color: white;
+}
+
+.cancel-button {
+    background: #dc3545;
+    color: white;
+}
+
+@media (max-width: 500px) {
+    .modal-content {
+        width: 100%;
+        padding: 15px;
+    }
+
+    .save-button,
+    .cancel-button {
+        width: 100%;
+    }
+}
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Màu nền tối để làm nổi bật modal */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.modal-content {
+    background: #ffffff !important; /* Đảm bảo màu nền trắng */
+    border-radius: 10px;
+    padding: 20px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease-in-out;
+}
+.radio-group {
+    display: flex; 
+    gap: 20px; /* Khoảng cách giữa các radio */
+    align-items: center; /* Căn giữa theo chiều dọc */
+    margin-top: 10px;
+}
+
+.radio-group label {
+    display: flex;
+    align-items: center;
+    gap: 5px; /* Khoảng cách giữa radio và chữ */
+    cursor: pointer;
+}
+
+.radio-group input[type="radio"] {
+    accent-color: #007bff; /* Đổi màu khi chọn */
+    width: 16px;
+    height: 16px;
+}
+select {
+    width: 100%; /* Full chiều rộng */
+    padding: 10px; /* Tăng padding */
+    font-size: 16px; /* Tăng cỡ chữ */
+    border: 2px solid #007bff; /* Viền màu xanh */
+    border-radius: 5px; /* Bo góc */
+    background-color: #f8f9fa; /* Màu nền nhạt */
+    color: #333; /* Màu chữ */
+    outline: none; /* Bỏ viền khi focus */
+    transition: all 0.3s ease-in-out;
+}
+
+/* Khi focus vào select */
+select:focus {
+    border-color: #0056b3;
+    box-shadow: 0px 0px 8px rgba(0, 91, 187, 0.5);
+}
+
+/* Style cho option */
+select option {
+    padding: 10px;
+    background: #fff;
+    color: #333;
+}
+
+/* Hiệu ứng hover cho option */
+select option:hover {
+    background: #007bff;
+    color: #fff;
+}
