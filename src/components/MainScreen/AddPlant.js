@@ -102,7 +102,7 @@ const AddPlant = ({ userName }) => {
         <div>
             <h2>Thêm kế hoạch sản xuất</h2>
             <button className='manfacturing-create-close-button' onClick={() => clickBackManfacturingOrders()}>
-                <IoMdClose className='manfacturing-detail-close-icon' />
+                <IoMdClose className='manfacturing-create-close-icon' />
             </button>
             <form onSubmit={handleSubmit}>
                 <label>Sản Phẩm</label><br />

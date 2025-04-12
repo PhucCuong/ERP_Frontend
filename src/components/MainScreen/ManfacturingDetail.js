@@ -3,7 +3,10 @@ import { useEffect, useState } from 'react';
 import { IoMdClose } from "react-icons/io";
 import axios from 'axios';
 import './ManfacturingDetail.css'
-const ManfacturingDetail = () => {
+import Spinner from 'react-bootstrap/Spinner';
+import { ToastContainer, toast } from 'react-toastify';
+
+const ManfacturingDetail = ({ userName }) => {
 
     const navigate = useNavigate();
 
@@ -27,6 +30,9 @@ const ManfacturingDetail = () => {
 
     // biến lưu danh sách lệnh sản xuất
     const [workOrders, setWorkOrders] = useState([])
+
+    // biến lưu trạng thái modal
+    const [isOpenModal, setIsOpenModal] = useState(false)
 
     useEffect(() => {
         setProductId(item.maSanPham)
@@ -111,13 +117,22 @@ const ManfacturingDetail = () => {
             })
     }
 
+    // biến makehoach từ 4 thành 'KHSX/00004'
+    function formatMaKeHoach(number) {
+        return `KHSX/${number.toString().padStart(5, '0')}`;
+    }
+
     const filterWorkOrder = (makehoach) => {
-        var list = workOrderList.filter(wo => wo.maKeHoach === makehoach)
+        var list = workOrderList.filter(wo => formatMaKeHoach(wo.maKeHoach) === makehoach)
         setWorkOrders(list)
     }
 
     const clickBackManfacturingOrders = () => {
         navigate('/manfacturingorders')
+    }
+
+    const openModal = () => {
+        setIsOpenModal(true)
     }
 
     return (
@@ -223,8 +238,8 @@ const ManfacturingDetail = () => {
                         workOrders.map((llv, index) => {
                             return (
                                 <tr style={{ backgroundColor: index % 2 !== 0 ? '#EFEFEF' : '#FFFFFF' }}>
-                                    <td title={llv.maLenh} style={{ width: 150, cursor: 'pointer', color: '#3E58CE' }} className='man-det-td' >{llv.maLenh.slice(0, 13)}...</td>
-                                    <td title={llv.maKeHoach} style={{ width: 150, cursor: 'pointer', color: '#3E58CE' }} className='man-det-td' >{llv.maKeHoach.slice(0, 13)}...</td>
+                                    <td title={llv.maLenh} style={{ width: 150, cursor: 'pointer', color: '#3E58CE' }} className='man-det-td' >{llv.maLenh}</td>
+                                    <td title={llv.maKeHoach} style={{ width: 150, cursor: 'pointer', color: '#3E58CE' }} className='man-det-td' >{item.maKeHoach}</td>
                                     <td className='man-det-td' style={{ width: 150 }}>
                                         {(() => {
                                             if (processList !== null) {
@@ -272,11 +287,214 @@ const ManfacturingDetail = () => {
                             )
                         })
                     }
-                    <div className='add-workorder'>Add work order</div>
+                    <div className='add-workorder' onClick={() => openModal()}>Add work order</div>
                 </tbody>
             </table>
+
+            {isOpenModal && <AddWorkOrderModal setIsOpenModal={setIsOpenModal} maKeHoach={item.maKeHoach} maSanPham={item.maSanPham} userName={userName} />}
+
         </div>
     )
 }
+
+const AddWorkOrderModal = ({ setIsOpenModal, maKeHoach, maSanPham, userName }) => {
+    const [formData, setFormData] = useState({
+        maKeHoach: '',
+        maQuyTrinh: '',
+        maSanPham: '',
+        soLuong: '',
+        ngayBatDau: '',
+        ngayKetThuc: '',
+        trangThai: 'Ready',
+        nguoiChiuTrachNhiem: '',
+        khuVucSanXuat: '',
+    });
+
+    const [loading, setLoading] = useState(false);
+
+    const [plants, setPlant] = useState([])
+    const [processes, setProcesses] = useState([])
+    const [products, setProducts] = useState([])
+    const [factorys, setFactorys] = useState([])
+
+    // lưu gán cứng tên sản phẩm
+    const [productName, setProductName] = useState('')
+
+    useEffect(() => {
+        axios.get('https://localhost:7135/api/KeHoachSanXuatx')
+            .then(response => {
+                setPlant(response.data);
+            })
+            .catch(error => {
+                console.error('Lỗi:', error);
+            });
+
+        axios.get('https://localhost:7135/api/QuyTrinhSanXuatx')
+            .then(response => {
+                setProcesses(response.data);
+            })
+            .catch(error => {
+                console.error('Lỗi:', error);
+            });
+        axios.get('https://localhost:7135/api/SanPhamx')
+            .then(response => {
+                setProducts(response.data);
+            })
+            .catch(error => {
+                console.error('Lỗi:', error);
+            });
+        axios.get('https://localhost:7135/api/NhaMayx')
+            .then(response => {
+                setFactorys(response.data);
+            })
+            .catch(error => {
+                console.error('Lỗi:', error);
+            });
+    }, [])
+
+    useEffect(() => {
+        const product = products.find(sp => sp.maSanPham.trim() === maSanPham.trim());
+        if (product) {
+            setProductName(product.tenSanPham);
+        }
+    }, [products, maSanPham])
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+
+    const handleSubmit = async () => {
+        const formSunmit = {
+            ...formData,
+            maKeHoach: parseInt(maKeHoach.split('/')[1]),
+            maSanPham,
+            nguoiChiuTrachNhiem: userName
+        };
+
+        console.log("Dữ liệu gửi đi:", formSunmit);
+
+        try {
+            const res = await axios.post('https://localhost:7135/api/LenhSanXuatx', formSunmit);
+            notify_success("Thêm lệnh sản xuất thành công!");
+            setLoading(false);
+
+            
+            setTimeout(() => {
+                setIsOpenModal(false);
+            }, 2000); 
+        } catch (err) {
+            setLoading(false);
+
+            // In toàn bộ thông tin lỗi ra console
+            console.error("Chi tiết lỗi:", err);
+
+            let errorMsg = 'Có lỗi xảy ra khi gửi yêu cầu!';
+
+            if (err.response) {
+                console.error("Lỗi từ phía server (response):", err.response);
+                errorMsg += ` Server trả về mã lỗi ${err.response.status}`;
+                if (typeof err.response.data === 'string') {
+                    errorMsg += ` - ${err.response.data}`;
+                } else if (err.response.data.message) {
+                    errorMsg += ` - ${err.response.data.message}`;
+                } else {
+                    errorMsg += ` - ${JSON.stringify(err.response.data)}`;
+                }
+            } else if (err.request) {
+                // Request được gửi đi nhưng không nhận được response
+                console.error("Yêu cầu đã gửi nhưng không có phản hồi (request):", err.request);
+                errorMsg += " Không nhận được phản hồi từ server.";
+            } else {
+                // Lỗi xảy ra khi chuẩn bị request
+                console.error("Lỗi khi tạo yêu cầu (message):", err.message);
+                errorMsg += ` ${err.message}`;
+            }
+
+            notify_error(errorMsg);
+        }
+    };
+
+    return (
+        <div className="modal-overlay">
+            <div className="modal-content">
+                <h2>Thêm Lệnh Sản Xuất</h2>
+                <div className="form-grid">
+
+                    <label>Mã kế hoạch:
+                        <select name="maKeHoach" value={formData.maKeHoach}>
+                            <option value="maKeHoach">{maKeHoach}</option>
+                        </select><br />
+                    </label>
+
+                    <label>Sản Phẩm:
+                        <select name="maSanPham" value={formData.productName}>
+                            <option value="productName">{productName}</option>
+                        </select><br />
+                    </label>
+
+                    <label>Quy Trình:
+                        <select name="maQuyTrinh" value={formData.maQuyTrinh} onChange={handleChange} required>
+                            <option value="">-- Chọn Quy Trình --</option>
+                            {processes.map(qt => (
+                                <option key={qt.maQuyTrinh} value={qt.maQuyTrinh}>{qt.tenQuyTrinh}</option>
+                            ))}
+                        </select><br />
+                    </label>
+
+                    <label>Số Lượng:
+                        <input name="soLuong" type="number" value={formData.soLuong} onChange={handleChange} />
+                    </label>
+
+                    <label>Ngày Bắt Đầu:
+                        <input name="ngayBatDau" type="datetime-local" value={formData.ngayBatDau} onChange={handleChange} />
+                    </label>
+
+                    <label>Ngày Kết Thúc:
+                        <input name="ngayKetThuc" type="datetime-local" value={formData.ngayKetThuc} onChange={handleChange} />
+                    </label>
+
+                    <label>Trạng Thái:
+                        <select name="trangThai" value={formData.trangThai} onChange={handleChange}>
+                            <option value="Ready">Ready</option>
+                            <option value="Inprogress">Inprogress</option>
+                            <option value="Block">Block</option>
+                            <option value="Done">Done</option>
+                        </select>
+                    </label>
+
+                    <label>Khu Vực Sản Xuất:
+                        <select name="maNhaMay" value={formData.khuVucSanXuat} onChange={handleChange} required>
+                            <option value="">-- Chọn Nhà Máy --</option>
+                            {factorys.map(nm => (
+                                <option key={nm.maNhaMay} value={nm.maNhaMay}>{nm.tenNhaMay}</option>
+                            ))}
+                        </select><br />
+                    </label>
+                </div>
+
+                <div className="modal-actions">
+                    <button className='btn-cancel' onClick={() => setIsOpenModal(false)}>Hủy</button>
+                    <button className='btn-send' onClick={handleSubmit}>Gửi</button>
+                </div>
+            </div>
+
+
+            {loading && (
+                <div className="loading-overlay">
+                    <Spinner animation="grow" variant="primary" />
+                </div>
+            )}
+            <ToastContainer theme="colored" />
+        </div>
+    );
+};
+
+const notify_success = (message) => toast.info(message, { type: "success" });
+const notify_error = (message) => toast.info(message, { type: "error" });
 
 export default ManfacturingDetail

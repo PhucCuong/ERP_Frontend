@@ -1,4 +1,5 @@
 import { Route, Routes, Navigate } from "react-router-dom";
+import { useState } from "react";
 import "./MainScreen.css";
 import Bom from "./Bom";
 import Products from "./Products";
@@ -26,7 +27,7 @@ const MainScreen = ({userName}) => {
                 <Route path="/bom" element={<Bom />} />
                 <Route path="/raw-materials" element={<RawMaterials />} />
                 <Route path="/products" element={<Products />} />
-                <Route path="/manfacturingorders" element={<Manfacturingorders />} />
+                <Route path="/manfacturingorders" element={<Manfacturingorders/>} />
                 <Route path="/workorders" element={<Workorders />} />
                 <Route path="/unbuildorders" element={<Unbuildorders />} />
                 <Route path="/scrap" element={<Scrap />} />
@@ -34,7 +35,7 @@ const MainScreen = ({userName}) => {
                 <Route path="/workcenters" element={<Workcenters />} />
                 <Route path="/reportings" element={<Reportings />} />
                 <Route path="/products/create" element={<CreateProduct />} />
-                <Route path="/manfacturing/detail" element={<ManfacturingDetail />} />
+                <Route path="/manfacturing/detail" element={<ManfacturingDetail userName={userName}/>} />
                 
                 <Route path="/activities/:processId" element={<ActivityList />} />
                 <Route path="/add-process" element={<AddProcessForm />} />
