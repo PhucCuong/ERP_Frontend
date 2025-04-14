@@ -5,6 +5,7 @@ import axios from 'axios';
 import './ManfacturingDetail.css'
 import Spinner from 'react-bootstrap/Spinner';
 import { ToastContainer, toast } from 'react-toastify';
+import { FaRegTrashAlt } from "react-icons/fa";
 
 const ManfacturingDetail = ({ userName }) => {
 
@@ -33,6 +34,12 @@ const ManfacturingDetail = ({ userName }) => {
 
     // biến lưu trạng thái modal
     const [isOpenModal, setIsOpenModal] = useState(false)
+
+
+    // biến lưu đóng mở modal xác nhận xóa work order
+    const [isShowDeleteModal, setIsShowDeleteModal] = useState(false)
+    // biến lưu mã lệnh sản xuát bị xóa để truyền vào modal delete
+    const [workOrderDeleteId, setWorkOrderDeleteId] = useState('')
 
     useEffect(() => {
         setProductId(item.maSanPham)
@@ -135,6 +142,11 @@ const ManfacturingDetail = ({ userName }) => {
         setIsOpenModal(true)
     }
 
+    const deleteWorkOrder = (work_order_delete_id) => {
+        setWorkOrderDeleteId(work_order_delete_id)
+        setIsShowDeleteModal(true)
+    }
+
     return (
         <div>
             <div className="header">View Manfacturing Order</div>
@@ -230,6 +242,7 @@ const ManfacturingDetail = ({ userName }) => {
                         <th className='man-det-th'>Real duration</th>
                         <th className='man-det-th'>Manufacturing Supervisor</th>
                         <th className='man-det-th'>Status</th>
+                        <th className='man-det-th'>Delete</th>
                     </tr>
                 </thead>
 
@@ -262,27 +275,30 @@ const ManfacturingDetail = ({ userName }) => {
                                     <td className='man-det-td' style={{ width: 100, color: '#FF3399' }}>{llv.ngayKetThuc.slice(0, 10)}</td>
                                     <td className='man-det-td' ></td>
                                     <td className='man-det-td' style={{ color: '#18A2B8', fontWeight: 'bold' }}>{llv.nguoiChiuTrachNhiem}</td>
-                                    <td className='man-det-td' ><div
-                                        className='man-det-td'
-                                        style={{
-                                            backgroundColor:
-                                                llv.trangThai === "Ready"
-                                                    ? "#18A2B8"
-                                                    : llv.trangThai === "Inprogress"
-                                                        ? "#FFFF66"
-                                                        : llv.trangThai === "Block"
-                                                            ? "#BB0000"
-                                                            : "transparent", // Màu mặc định nếu không khớp
-                                            color: "white", // Đổi màu chữ để dễ đọc hơn
-                                            fontWeight: "bold", // Làm nổi bật chữ
-                                            textAlign: "center", // Căn giữa nội dung
-                                            width: 50
-                                        }}
-                                    >
-                                        {llv.trangThai}
-                                    </div>
+                                    <td className='man-det-td' >
+                                        <div
+                                            className='man-det-td'
+                                            style={{
+                                                backgroundColor:
+                                                    llv.trangThai === "Ready"
+                                                        ? "#18A2B8"
+                                                        : llv.trangThai === "Inprogress"
+                                                            ? "#FFFF66"
+                                                            : llv.trangThai === "Block"
+                                                                ? "#BB0000"
+                                                                : "transparent", // Màu mặc định nếu không khớp
+                                                color: "white", // Đổi màu chữ để dễ đọc hơn
+                                                fontWeight: "bold", // Làm nổi bật chữ
+                                                textAlign: "center", // Căn giữa nội dung
+                                                width: 50
+                                            }}
+                                        >
+                                            {llv.trangThai}
+                                        </div>
                                     </td>
-
+                                    <td>
+                                        <button className='md-delete-btn' onClick={() => deleteWorkOrder(llv.maLenh)}><FaRegTrashAlt /></button>
+                                    </td>
                                 </tr>
                             )
                         })
@@ -291,13 +307,20 @@ const ManfacturingDetail = ({ userName }) => {
                 </tbody>
             </table>
 
-            {isOpenModal && <AddWorkOrderModal setIsOpenModal={setIsOpenModal} maKeHoach={item.maKeHoach} maSanPham={item.maSanPham} userName={userName} />}
-
+            {isOpenModal && <AddWorkOrderModal setIsOpenModal={setIsOpenModal} maKeHoach={item.maKeHoach}
+                maSanPham={item.maSanPham} userName={userName} setWorkOrders={setWorkOrders} setWorkOrderList={setWorkOrderList}
+            />
+            }
+            {
+                isShowDeleteModal && <ConfirmDeleteModal setIsShowDeleteModal={setIsShowDeleteModal}
+                    workOrderDeleteId={workOrderDeleteId} setWorkOrders={setWorkOrders} setWorkOrderList={setWorkOrderList} maKeHoach={item.maKeHoach}
+                />
+            }
         </div>
     )
 }
 
-const AddWorkOrderModal = ({ setIsOpenModal, maKeHoach, maSanPham, userName }) => {
+const AddWorkOrderModal = ({ setIsOpenModal, maKeHoach, maSanPham, userName, setWorkOrders, setWorkOrderList }) => {
     const [formData, setFormData] = useState({
         maKeHoach: '',
         maQuyTrinh: '',
@@ -369,6 +392,7 @@ const AddWorkOrderModal = ({ setIsOpenModal, maKeHoach, maSanPham, userName }) =
 
 
     const handleSubmit = async () => {
+        setLoading(true);
         const formSunmit = {
             ...formData,
             maKeHoach: parseInt(maKeHoach.split('/')[1]),
@@ -376,17 +400,24 @@ const AddWorkOrderModal = ({ setIsOpenModal, maKeHoach, maSanPham, userName }) =
             nguoiChiuTrachNhiem: userName
         };
 
-        console.log("Dữ liệu gửi đi:", formSunmit);
-
         try {
             const res = await axios.post('https://localhost:7135/api/LenhSanXuatx', formSunmit);
             notify_success("Thêm lệnh sản xuất thành công!");
             setLoading(false);
 
-            
+            // rerender lại table work order
+            // gọi lại API để lấy work order mới nhất
+            const result = await axios.get('https://localhost:7135/api/LenhSanXuatx');
+            setWorkOrderList(result.data);
+
+            // filter lại sau khi có danh sách mới
+            const filtered = result.data.filter(item => item.maKeHoach === maKeHoach);
+            setWorkOrders(filtered); // <<< thêm dòng này để cập nhật render
+
+
             setTimeout(() => {
                 setIsOpenModal(false);
-            }, 2000); 
+            }, 1000);
         } catch (err) {
             setLoading(false);
 
@@ -496,5 +527,130 @@ const AddWorkOrderModal = ({ setIsOpenModal, maKeHoach, maSanPham, userName }) =
 
 const notify_success = (message) => toast.info(message, { type: "success" });
 const notify_error = (message) => toast.info(message, { type: "error" });
+
+const ConfirmDeleteModal = ({ setIsShowDeleteModal, workOrderDeleteId, setWorkOrders, setWorkOrderList, maKeHoach }) => {
+
+    const [loading, setLoading] = useState(false);
+
+    const handleYes = async () => {
+        setLoading(true);
+        try {
+            const id = Number(workOrderDeleteId.slice(4,9))
+            console.log(id)
+            const res = await axios.delete(`https://localhost:7135/api/LenhSanXuatx/${id}`)
+
+            notify_success('Deleted work order successfully!')
+            setLoading(false);
+
+            // rerender lại table work order
+            // gọi lại API để lấy work order mới nhất
+            const result = await axios.get('https://localhost:7135/api/LenhSanXuatx');
+            setWorkOrderList(result.data);
+
+            // filter lại sau khi có danh sách mới
+            const filtered = result.data.filter(item => item.maKeHoach === maKeHoach);
+            setWorkOrders(filtered); // <<< thêm dòng này để cập nhật render
+        } catch (err) {
+            setLoading(false);
+
+            // In toàn bộ thông tin lỗi ra console
+            console.error("Chi tiết lỗi:", err);
+
+            let errorMsg = 'Có lỗi xảy ra khi gửi yêu cầu!';
+
+            if (err.response) {
+                console.error("Lỗi từ phía server (response):", err.response);
+                errorMsg += ` Server trả về mã lỗi ${err.response.status}`;
+                if (typeof err.response.data === 'string') {
+                    errorMsg += ` - ${err.response.data}`;
+                } else if (err.response.data.message) {
+                    errorMsg += ` - ${err.response.data.message}`;
+                } else {
+                    errorMsg += ` - ${JSON.stringify(err.response.data)}`;
+                }
+            } else if (err.request) {
+                // Request được gửi đi nhưng không nhận được response
+                console.error("Yêu cầu đã gửi nhưng không có phản hồi (request):", err.request);
+                errorMsg += " Không nhận được phản hồi từ server.";
+            } else {
+                // Lỗi xảy ra khi chuẩn bị request
+                console.error("Lỗi khi tạo yêu cầu (message):", err.message);
+                errorMsg += ` ${err.message}`;
+            }
+
+            notify_error(errorMsg);
+        }
+        setTimeout(() => {
+            setIsShowDeleteModal(false)
+        }, 1000);
+        
+    };
+
+    const handleNo = () => {
+        setIsShowDeleteModal(false)
+    };
+
+    return (
+        <div style={styles.overlay}>
+            <div style={styles.modal}>
+                <p style={styles.message}>Do you want to delete this work order?</p>
+                <div style={styles.buttons}>
+                    <button style={styles.yesButton} onClick={handleYes}>Yes</button>
+                    <button style={styles.noButton} onClick={handleNo}>No</button>
+                </div>
+            </div>
+
+            {loading && (
+                <div className="loading-overlay">
+                    <Spinner animation="grow" variant="primary" />
+                </div>
+            )}
+            <ToastContainer theme="colored" />
+        </div>
+    );
+};
+
+const styles = {
+    overlay: {
+        position: 'fixed',
+        top: 0, left: 0, right: 0, bottom: 0,
+        backgroundColor: 'rgba(0,0,0,0.4)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 1000
+    },
+    modal: {
+        backgroundColor: '#fff',
+        padding: '20px 30px',
+        borderRadius: '8px',
+        textAlign: 'center',
+        minWidth: '300px',
+    },
+    message: {
+        fontSize: '18px',
+        marginBottom: '20px',
+    },
+    buttons: {
+        display: 'flex',
+        justifyContent: 'space-around',
+    },
+    yesButton: {
+        backgroundColor: '#d9534f',
+        color: 'white',
+        border: 'none',
+        padding: '10px 20px',
+        borderRadius: '5px',
+        cursor: 'pointer'
+    },
+    noButton: {
+        backgroundColor: '#5bc0de',
+        color: 'white',
+        border: 'none',
+        padding: '10px 20px',
+        borderRadius: '5px',
+        cursor: 'pointer'
+    }
+};
 
 export default ManfacturingDetail

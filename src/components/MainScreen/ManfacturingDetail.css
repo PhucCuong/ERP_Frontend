@@ -170,5 +170,14 @@
     border: none
 }
 
+.md-delete-btn {
+    border: none;
+    color: red;
+}
+
+.md-delete-btn:hover {
+    color: rgb(243, 136, 136);
+}
+
   
 
