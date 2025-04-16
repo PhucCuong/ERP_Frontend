@@ -170,15 +170,15 @@ const AddProcessForm = () => {
                                             <td>{activity.moTa}</td>
                                         </tr>
                                     ))}
-                                    <tr>
-                                        <button
-                                            className="add-row-button"
-                                            onClick={handleAddRow}
-                                            type="button"
-                                        >
-                                            + Thêm một hoạt động
-                                        </button>
-                                    </tr>
+
+                                    <button
+                                        className="add-row-button"
+                                        onClick={handleAddRow}
+                                        type="button"
+                                    >
+                                        + Thêm một hoạt động
+                                    </button>
+
                                 </tbody>
                             </table>
                         </div>

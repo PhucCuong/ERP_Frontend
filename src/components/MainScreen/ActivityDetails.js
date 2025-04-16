@@ -1,8 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import "./ActivityDetails.css";
+import { ToastContainer, toast } from 'react-toastify';
 
 const ActivityDetails = ({ onSave, onCancel }) => {
+
+    const inputIndexRef = useRef(null);
+
     const [activeTab, setActiveTab] = useState("moTa");
     const [quyTrinhList, setQuyTrinhList] = useState([]);
     const [newActivity, setNewActivity] = useState({
@@ -21,8 +25,14 @@ const ActivityDetails = ({ onSave, onCancel }) => {
     const [error, setError] = useState(null);
     const [previewUrl, setPreviewUrl] = useState(null);
 
+    // biến để lấy ra mã quy trình đi validate coi có thứ tự chưa
+    const [processId, setProcessId] = useState('')
+
     const handleChange = (e) => {
         const { name, value } = e.target;
+        if (name === 'maQuyTrinh') {
+            setProcessId(value)
+        }
         setNewActivity(prev => ({ ...prev, [name]: value }));
     };
 
@@ -44,7 +54,7 @@ const ActivityDetails = ({ onSave, onCancel }) => {
         setError(null);
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
-            
+
             // Kiểm tra loại file
             if (file.type !== "application/pdf") {
                 setError("Vui lòng chọn file PDF");
@@ -61,10 +71,10 @@ const ActivityDetails = ({ onSave, onCancel }) => {
             const fileUrl = URL.createObjectURL(file);
             setPreviewUrl(fileUrl);
 
-            setNewActivity(prev => ({ 
-                ...prev, 
+            setNewActivity(prev => ({
+                ...prev,
                 banVe: file,
-                fileName: file.name 
+                fileName: file.name
             }));
         }
     };
@@ -108,12 +118,12 @@ const ActivityDetails = ({ onSave, onCancel }) => {
 
     const handleSave = async () => {
         if (isSubmitting) return;
-        
+
         if (!validateForm()) return;
-        
+
         setIsSubmitting(true);
         setError(null);
-    
+
         try {
             // Bước 1: Tạo hoạt động mới
             const activityData = new FormData();
@@ -125,31 +135,31 @@ const ActivityDetails = ({ onSave, onCancel }) => {
             activityData.append("DieuKienBatDauGiaiDoanTiepTheo", newActivity.dieuKienBatDau || "");
             activityData.append("ThoiGianMacDinh", newActivity.thoiGianMacDinh);
             activityData.append("MoTa", newActivity.moTa || "");
-    
+
             const response = await axios.post(
-                "https://localhost:7135/api/ChiTietHoatDongSanXuats", 
+                "https://localhost:7135/api/ChiTietHoatDongSanXuats",
                 activityData,
                 {
-                    headers: { 
+                    headers: {
                         "Content-Type": "multipart/form-data",
                     }
                 }
             );
-    
+
             console.log("Phản hồi từ server khi tạo hoạt động:", response.data);
             const maHoatDong = response.data.maHoatDong;
-    
+
             if (!maHoatDong) {
                 throw new Error("Không nhận được mã hoạt động từ server");
             }
-    
+
             // Bước 2: Nếu có file PDF, thực hiện upload riêng
             if (newActivity.banVe) {
                 try {
                     console.log("Bắt đầu upload file PDF...");
                     const fileData = new FormData();
                     fileData.append("file", newActivity.banVe); // Đổi tên param để rõ ràng
-    
+
                     // Gọi API upload nhưng KHÔNG sử dụng dữ liệu trả về
                     await axios.post(
                         `https://localhost:7135/api/ChiTietHoatDongSanXuats/${maHoatDong}/upload`,
@@ -160,31 +170,32 @@ const ActivityDetails = ({ onSave, onCancel }) => {
                             }
                         }
                     );
-                    
+
                     console.log("Upload file thành công");
                 } catch (uploadError) {
                     console.error("Lỗi khi upload file:", uploadError);
                     // Vẫn tiếp tục dù upload file thất bại
-                    alert("Lưu hoạt động thành công nhưng upload file không thành công");
+                    notify_success("Lưu hoạt động thành công nhưng upload file không thành công");
                 }
             }
-    
-            alert("Lưu hoạt động thành công!");
+
+            notify_success("Lưu hoạt động thành công!");
             // Sử dụng dữ liệu từ response tạo hoạt động ban đầu
-            onSave(response.data);
-            
+            setTimeout(() => {
+                onSave(response.data);
+            }, 2000);
         } catch (error) {
             console.error("Lỗi trong quá trình lưu:", error);
-            
+
             let errorMessage = "Lưu thất bại, vui lòng thử lại!";
             if (error.response) {
-                errorMessage = error.response.data?.message || 
-                             error.response.data?.title || 
-                             "Dữ liệu không hợp lệ";
+                errorMessage = error.response.data?.message ||
+                    error.response.data?.title ||
+                    "Dữ liệu không hợp lệ";
             } else if (error.message) {
                 errorMessage = error.message;
             }
-            
+
             setError(errorMessage);
         } finally {
             setIsSubmitting(false);
@@ -207,11 +218,38 @@ const ActivityDetails = ({ onSave, onCancel }) => {
         };
     }, [previewUrl]);
 
+    const checkThuTu = async (e) => {
+        var index = e.target.value
+
+        if (index === "" || isNaN(index)) {
+            notify_error('Hãy điền vào ô trình tự')
+            inputIndexRef.current.style.borderColor = 'red'
+            return
+        }
+
+        var requestbody = {
+            maQuyTrinh: processId,
+            thuTu: index
+        }
+
+        const response = await axios.post('https://localhost:7135/api/ChiTietHoatDongSanXuats/kiem-tra-thu-tu', requestbody)
+
+        if (response.data.success === false) {
+            notify_error(response.data.message)
+            inputIndexRef.current.value = ''
+            inputIndexRef.current.style.borderColor = 'red'
+        }
+    }
+
+    const handleFocus = () => {
+        inputIndexRef.current.style.borderColor = 'black'
+    };
+
     return (
         <div className="modal-overlay">
             <div className="modal-content">
                 <h3>Thêm Hoạt động</h3>
-                
+
                 {error && <div className="error-message">{error}</div>}
 
                 <div className="form-group">
@@ -266,10 +304,12 @@ const ActivityDetails = ({ onSave, onCancel }) => {
                             name="thuTu"
                             value={newActivity.thuTu}
                             onChange={handleChange}
+                            onBlur={(e) => checkThuTu(e)}
                             required
                             disabled={isSubmitting}
                             min="1"
-                            placeholder="1"
+                            ref={inputIndexRef}
+                            onFocus={handleFocus}
                         />
                     </div>
 
@@ -372,9 +412,9 @@ const ActivityDetails = ({ onSave, onCancel }) => {
                             <div className="file-info">
                                 <span>File đã chọn: {newActivity.fileName}</span>
                                 {previewUrl && (
-                                    <a 
-                                        href={previewUrl} 
-                                        target="_blank" 
+                                    <a
+                                        href={previewUrl}
+                                        target="_blank"
                                         rel="noopener noreferrer"
                                         className="preview-link"
                                     >
@@ -410,8 +450,18 @@ const ActivityDetails = ({ onSave, onCancel }) => {
                     </button>
                 </div>
             </div>
+
+            <ToastContainer theme="colored" />
         </div>
     );
 };
+
+const notify_success = (message) => toast.info(message, {
+    type: "success"
+});
+
+const notify_error = (message) => toast.info(message, {
+    type: "error"
+});
 
 export default ActivityDetails;
