@@ -6,7 +6,7 @@ import './ManfacturingDetail.css'
 import Spinner from 'react-bootstrap/Spinner';
 import { ToastContainer, toast } from 'react-toastify';
 import { FaRegTrashAlt } from "react-icons/fa";
-
+import { Link } from 'react-router-dom';
 const ManfacturingDetail = ({ userName }) => {
 
     const navigate = useNavigate();
@@ -40,7 +40,7 @@ const ManfacturingDetail = ({ userName }) => {
     const [isShowDeleteModal, setIsShowDeleteModal] = useState(false)
     // biến lưu mã lệnh sản xuát bị xóa để truyền vào modal delete
     const [workOrderDeleteId, setWorkOrderDeleteId] = useState('')
-
+    const [filteredProcesses, setFilteredProcesses] = useState([]);
     useEffect(() => {
         setProductId(item.maSanPham)
         callApiGetBomList()
@@ -256,8 +256,16 @@ const ManfacturingDetail = ({ userName }) => {
                                     <td className='man-det-td' style={{ width: 150 }}>
                                         {(() => {
                                             if (processList !== null) {
-                                                var object = processList.filter(p => p.maQuyTrinh === llv.maQuyTrinh)[0];
-                                                return object ? object.tenQuyTrinh : "";
+                                                const object = processList.find(p => p.maQuyTrinh === llv.maQuyTrinh);
+                                                return object ? (
+                                                    <Link
+                                                        to={`/activities/${llv.maQuyTrinh}`}
+                                                        style={{ textDecoration: 'none' }}
+                                                        className="link-process"
+                                                    >
+                                                        {object.tenQuyTrinh}
+                                                    </Link>
+                                                ) : "";
                                             }
                                         })()}
                                     </td>
@@ -334,14 +342,12 @@ const AddWorkOrderModal = ({ setIsOpenModal, maKeHoach, maSanPham, userName, set
     });
 
     const [loading, setLoading] = useState(false);
-
-    const [plants, setPlant] = useState([])
-    const [processes, setProcesses] = useState([])
-    const [products, setProducts] = useState([])
-    const [factorys, setFactorys] = useState([])
-
-    // lưu gán cứng tên sản phẩm
-    const [productName, setProductName] = useState('')
+    const [plants, setPlant] = useState([]);
+    const [processes, setProcesses] = useState([]);
+    const [products, setProducts] = useState([]);
+    const [factorys, setFactorys] = useState([]);
+    const [filteredProcesses, setFilteredProcesses] = useState([]);
+    const [productName, setProductName] = useState('');
 
     useEffect(() => {
         axios.get('https://localhost:7135/api/KeHoachSanXuatx')
@@ -359,6 +365,7 @@ const AddWorkOrderModal = ({ setIsOpenModal, maKeHoach, maSanPham, userName, set
             .catch(error => {
                 console.error('Lỗi:', error);
             });
+
         axios.get('https://localhost:7135/api/SanPhamx')
             .then(response => {
                 setProducts(response.data);
@@ -366,6 +373,7 @@ const AddWorkOrderModal = ({ setIsOpenModal, maKeHoach, maSanPham, userName, set
             .catch(error => {
                 console.error('Lỗi:', error);
             });
+
         axios.get('https://localhost:7135/api/NhaMayx')
             .then(response => {
                 setFactorys(response.data);
@@ -373,14 +381,28 @@ const AddWorkOrderModal = ({ setIsOpenModal, maKeHoach, maSanPham, userName, set
             .catch(error => {
                 console.error('Lỗi:', error);
             });
-    }, [])
+    }, []);
 
     useEffect(() => {
         const product = products.find(sp => sp.maSanPham.trim() === maSanPham.trim());
         if (product) {
             setProductName(product.tenSanPham);
         }
-    }, [products, maSanPham])
+    }, [products, maSanPham]);
+
+    useEffect(() => {
+        if (maSanPham && processes.length > 0) {
+            const filtered = processes.filter(process => process.maSanPham === maSanPham);
+            setFilteredProcesses(filtered);
+            // Tự động chọn quy trình đầu tiên nếu có
+            if (filtered.length > 0) {
+                setFormData(prev => ({
+                    ...prev,
+                    maQuyTrinh: filtered[0].maQuyTrinh
+                }));
+            }
+        }
+    }, [maSanPham, processes]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -389,7 +411,6 @@ const AddWorkOrderModal = ({ setIsOpenModal, maKeHoach, maSanPham, userName, set
             [name]: value
         }));
     };
-
 
     const handleSubmit = async () => {
         setLoading(true);
@@ -405,29 +426,21 @@ const AddWorkOrderModal = ({ setIsOpenModal, maKeHoach, maSanPham, userName, set
             notify_success("Thêm lệnh sản xuất thành công!");
             setLoading(false);
 
-            // rerender lại table work order
-            // gọi lại API để lấy work order mới nhất
             const result = await axios.get('https://localhost:7135/api/LenhSanXuatx');
             setWorkOrderList(result.data);
 
-            // filter lại sau khi có danh sách mới
             const filtered = result.data.filter(item => item.maKeHoach === maKeHoach);
-            setWorkOrders(filtered); // <<< thêm dòng này để cập nhật render
-
+            setWorkOrders(filtered);
 
             setTimeout(() => {
                 setIsOpenModal(false);
             }, 1000);
         } catch (err) {
             setLoading(false);
-
-            // In toàn bộ thông tin lỗi ra console
             console.error("Chi tiết lỗi:", err);
-
             let errorMsg = 'Có lỗi xảy ra khi gửi yêu cầu!';
 
             if (err.response) {
-                console.error("Lỗi từ phía server (response):", err.response);
                 errorMsg += ` Server trả về mã lỗi ${err.response.status}`;
                 if (typeof err.response.data === 'string') {
                     errorMsg += ` - ${err.response.data}`;
@@ -437,12 +450,8 @@ const AddWorkOrderModal = ({ setIsOpenModal, maKeHoach, maSanPham, userName, set
                     errorMsg += ` - ${JSON.stringify(err.response.data)}`;
                 }
             } else if (err.request) {
-                // Request được gửi đi nhưng không nhận được response
-                console.error("Yêu cầu đã gửi nhưng không có phản hồi (request):", err.request);
                 errorMsg += " Không nhận được phản hồi từ server.";
             } else {
-                // Lỗi xảy ra khi chuẩn bị request
-                console.error("Lỗi khi tạo yêu cầu (message):", err.message);
                 errorMsg += ` ${err.message}`;
             }
 
@@ -455,7 +464,6 @@ const AddWorkOrderModal = ({ setIsOpenModal, maKeHoach, maSanPham, userName, set
             <div className="modal-content">
                 <h2>Thêm Lệnh Sản Xuất</h2>
                 <div className="form-grid">
-
                     <label>Mã kế hoạch:
                         <select name="maKeHoach" value={formData.maKeHoach}>
                             <option value="maKeHoach">{maKeHoach}</option>
@@ -470,10 +478,13 @@ const AddWorkOrderModal = ({ setIsOpenModal, maKeHoach, maSanPham, userName, set
 
                     <label>Quy Trình:
                         <select name="maQuyTrinh" value={formData.maQuyTrinh} onChange={handleChange} required>
-                            <option value="">-- Chọn Quy Trình --</option>
-                            {processes.map(qt => (
-                                <option key={qt.maQuyTrinh} value={qt.maQuyTrinh}>{qt.tenQuyTrinh}</option>
-                            ))}
+                            {filteredProcesses.length > 0 ? (
+                                filteredProcesses.map(qt => (
+                                    <option key={qt.maQuyTrinh} value={qt.maQuyTrinh}>{qt.tenQuyTrinh}</option>
+                                ))
+                            ) : (
+                                <option value="">Không có quy trình phù hợp</option>
+                            )}
                         </select><br />
                     </label>
 
@@ -514,7 +525,6 @@ const AddWorkOrderModal = ({ setIsOpenModal, maKeHoach, maSanPham, userName, set
                 </div>
             </div>
 
-
             {loading && (
                 <div className="loading-overlay">
                     <Spinner animation="grow" variant="primary" />
@@ -535,7 +545,7 @@ const ConfirmDeleteModal = ({ setIsShowDeleteModal, workOrderDeleteId, setWorkOr
     const handleYes = async () => {
         setLoading(true);
         try {
-            const id = Number(workOrderDeleteId.slice(4,9))
+            const id = Number(workOrderDeleteId.slice(4, 9))
             console.log(id)
             const res = await axios.delete(`https://localhost:7135/api/LenhSanXuatx/${id}`)
 
@@ -583,7 +593,7 @@ const ConfirmDeleteModal = ({ setIsShowDeleteModal, workOrderDeleteId, setWorkOr
         setTimeout(() => {
             setIsShowDeleteModal(false)
         }, 1000);
-        
+
     };
 
     const handleNo = () => {

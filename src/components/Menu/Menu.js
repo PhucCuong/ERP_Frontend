@@ -1,120 +1,81 @@
 import { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
-import { SiMaterialdesignicons } from "react-icons/si";
-import { MdProductionQuantityLimits } from "react-icons/md";
-import { GrPlan } from "react-icons/gr";
-import { GrUserWorker } from "react-icons/gr";
-import { MdInsertPageBreak } from "react-icons/md";
-import { IoTrashBinOutline } from "react-icons/io5";
-import { AiOutlineRetweet } from "react-icons/ai";
-import { RiBuilding2Fill } from "react-icons/ri";
-import { BsReception4 } from "react-icons/bs";
-import { AiOutlineDeploymentUnit } from "react-icons/ai";
-import './Menu.css';
+import { SiMaterialdesignicons } from 'react-icons/si';
+import { MdProductionQuantityLimits, MdInsertPageBreak } from 'react-icons/md';
+import { GrPlan, GrUserWorker } from 'react-icons/gr';
+import { IoTrashBinOutline } from 'react-icons/io5';
+import { AiOutlineRetweet, AiOutlineDeploymentUnit } from 'react-icons/ai';
+import { RiBuilding2Fill } from 'react-icons/ri';
+import { BsReception4 } from 'react-icons/bs';
+import { FaChevronDown } from 'react-icons/fa';
 
+import { FaWarehouse } from 'react-icons/fa';
+import './Menu.css';
 import { jwtDecode } from 'jwt-decode';
 
-const Menu = ({setUserName}) => {
+const Menu = ({ setUserName }) => {
+    const [page, setPage] = useState('');
+    const [user, setUser] = useState({});
+    const [open, setOpen] = useState(false); // Toggle dropdown
+    const [openWarehouse, setOpenWarehouse] = useState(false);
+    const [openCategory, setOpenCategory] = useState(false);
+    const allowedRoles = {
+        bom: ['Admin', 'Bộ phận kỹ thuật', 'Bộ phận sản xuất'],
+        material: ['Admin', 'Bộ phận kỹ thuật', 'Bộ phận sản xuất'],
+        product: ['Admin', 'Bộ phận kỹ thuật', 'Bộ phận kế hoạch', 'Bộ phận kiểm tra chất lượng', 'Bộ phận sản xuất', 'Bộ phận bán hàng', 'Bộ phận kho'],
+        manufacturing: ['Admin', 'Bộ phận kế hoạch', 'Bộ phận sản xuất', 'Bộ phận kiểm tra chất lượng'],
+        workOrder: ['Admin', 'Bộ phận kế hoạch', 'Bộ phận sản xuất', 'Bộ phận kiểm tra chất lượng'],
+        unbuild: ['Admin', 'Bộ phận kế hoạch', 'Bộ phận sản xuất', 'Bộ phận kiểm tra chất lượng'],
+        scrap: ['Admin', 'Bộ phận kế hoạch', 'Bộ phận kiểm tra chất lượng', 'Bộ phận kho'],
+        process: ['Admin', 'Bộ phận kỹ thuật', 'Bộ phận sản xuất'],
+        workCenter: ['Admin', 'Bộ phận kỹ thuật', 'Bộ phận sản xuất'],
+        report: ['Admin', 'Bộ phận kế hoạch'],
+        tonkho: ['Admin', 'Bộ phận kho'],
+    };
 
-    const [page, setPage] = useState('bom')
-    const [user, setUser] = useState({})
-
-    const bomRole = [
-        'Admin',
-        'Bộ phận kỹ thuật',
-        'Bộ phận sản xuất',
-    ]
-
-    const materialRole = [
-        'Admin',
-        'Bộ phận kỹ thuật',
-        'Bộ phận sản xuất',
-    ]
-
-    const productRole = [
-        'Admin',
-        'Bộ phận kỹ thuật',
-        'Bộ phận kế hoạch',
-        'Bộ phận kiểm tra chất lượng',
-        'Bộ phận sản xuất',
-        'Bộ phận bán hàng',
-        'Bộ phận kho'
-    ]
-
-    const manfacturingOrderRole = [
-        'Admin',
-        'Bộ phận kế hoạch',
-        'Bộ phận sản xuất',
-        'Bộ phận kiểm tra chất lượng',
-    ]
-
-    const workOrderRole = [
-        'Admin',
-        'Bộ phận kế hoạch',
-        'Bộ phận sản xuất',
-        'Bộ phận kiểm tra chất lượng',
-    ]
-
-    const unbuiltOrderRole = [
-        'Admin',
-        'Bộ phận kế hoạch',
-        'Bộ phận sản xuất',
-        'Bộ phận kiểm tra chất lượng',
-    ]
-
-    const scrapRole = [
-        'Admin',
-        'Bộ phận kế hoạch',
-        'Bộ phận kiểm tra chất lượng',
-        'Bộ phận kho'
-    ]
-
-    const productionProcessRole = [
-        'Admin',
-        'Bộ phận kỹ thuật',
-        'Bộ phận sản xuất'
-    ]
-
-    const workCenterRole = [
-        'Admin',
-        'Bộ phận kỹ thuật',
-        'Bộ phận sản xuất'
-    ]
-
-    const reportRole = [
-        'Admin',
-        'Bộ phận kế hoạch',
-    ]
     useEffect(() => {
-        const token = localStorage.getItem("userToken")
-        if (!token) return null
-
+        const token = localStorage.getItem("userToken");
+        if (!token) return;
         try {
             const decoded = jwtDecode(token);
-            let info = {
+            const info = {
                 user_name: decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"],
                 role: decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"],
                 name: decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname"],
             };
-
             setUser(info); // In ra để kiểm tra
             setUserName(info.name)
         } catch (error) {
             console.error("Token không hợp lệ", error);
         }
-    }, [])
+    }, []);
 
-        ;
+    const renderNavLink = (to, label, icon, key) => (
+        <NavLink
+            onClick={() => setPage(key)}
+            to={to}
+            className='btn-menu'
+            style={{
+                backgroundColor: page === key ? '#E4E7F2' : '#3E58CE',
+                color: page === key ? '#3348A9' : '#ffffff',
+                fontSize: 18,
+                textDecoration: 'none',
+            }}
+        >
+            {icon}&emsp;{label}
+
+        </NavLink>
+    );
+
     return (
         <div className="menu_container">
             <div className='user'>
-                < img src='https://thumbs.dreamstime.com/b/user-sign-icon-person-symbol-human-avatar-rich-man-84519083.jpg'
-                    alt="Example Image"
+                <img
+                    src='https://thumbs.dreamstime.com/b/user-sign-icon-person-symbol-human-avatar-rich-man-84519083.jpg'
+                    alt="Avatar"
                     width="100"
                     height="100"
-                    style={{
-                        borderRadius: '50%'
-                    }}
+                    style={{ borderRadius: '50%' }}
                 />
                 <div>
                     <p className='name'>{user.name}</p>
@@ -122,188 +83,119 @@ const Menu = ({setUserName}) => {
                 </div>
             </div>
             <div className='line'></div>
-            <div
-                style={{
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column'
-                }}
-            >
-                {bomRole.includes(user.role) && (
-                    <NavLink
-                        onClick={() => setPage('bom')}
-                        to="/bom"
-                        className='btn-menu'
+
+            <div className='btn-menu-group'>
+
+                <div
+                    onClick={() => setOpenCategory(!openCategory)}
+                    className='btn-menu'
+                    style={{
+                        backgroundColor: '#3E58CE',
+                        color: '#ffffff',
+                        cursor: 'pointer',
+                        fontSize: 18,
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        paddingRight: '16px'
+                    }}
+                >
+                    <span>📁&emsp;Danh mục sản xuất</span>
+                    <FaChevronDown
                         style={{
-                            backgroundColor: page === 'bom' ? '#E4E7F2' : '#3E58CE',
-                            color: page === 'bom' ? '#3348A9' : '#ffffff',
-                            fontSize: 18,
-                            textDecoration: 'none',
+                            transition: 'transform 0.3s ease',
+                            transform: openCategory ? 'rotate(180deg)' : 'rotate(0deg)'
                         }}
-                    >
-                        <SiMaterialdesignicons />&emsp;
-                        Bill of meterial
-                    </NavLink>
+                    />
+                </div>
+                {openCategory && (
+                    <div className='submenu'>
+                        {allowedRoles.material.includes(user.role) &&
+                            renderNavLink('/raw-materials', 'Nguyên vật liệu', <AiOutlineDeploymentUnit />, 'raw-materials')}
+                        {allowedRoles.product.includes(user.role) &&
+                            renderNavLink('/products', 'Sản phẩm', <MdProductionQuantityLimits />, 'products')}
+                                {allowedRoles.workCenter.includes(user.role) &&
+                            renderNavLink('/workcenters', 'Nhà máy', <RiBuilding2Fill />, 'workcenters')}
+                            
+                    </div>
                 )}
-
-                {materialRole.includes(user.role) && (
-                    <NavLink
-                        onClick={() => setPage('raw-materials')}
-                        to="/raw-materials"
-                        className='btn-menu'
+                <div
+                    onClick={() => setOpen(!open)}
+                    className='btn-menu'
+                    style={{
+                        backgroundColor: '#3E58CE',
+                        color: '#ffffff',
+                        cursor: 'pointer',
+                        fontSize: 18,
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        paddingRight: '16px'
+                    }}
+                >
+                    <span>🏭&emsp;Hoạt động sản xuất</span>
+                    <FaChevronDown
                         style={{
-                            backgroundColor: page === 'raw-materials' ? '#E4E7F2' : '#3E58CE',
-                            color: page === 'raw-materials' ? '#3348A9' : '#ffffff',
-                            fontSize: 18,
-                            textDecoration: 'none',
+                            transition: 'transform 0.3s ease',
+                            transform: open ? 'rotate(180deg)' : 'rotate(0deg)'
                         }}
-                    >
-                        <AiOutlineDeploymentUnit />&emsp;
-                        Raw Materials
-                    </NavLink>
+                    />
+                </div>
+
+                {open && (
+                    <div className='submenu'>
+                        {allowedRoles.bom.includes(user.role) &&
+                            renderNavLink('/bom', 'Định mức nguyên vật liệu', <SiMaterialdesignicons />, 'bom')}
+                        {allowedRoles.manufacturing.includes(user.role) &&
+                            renderNavLink('/manfacturingorders', 'Kế hoạch sản xuất', <GrPlan />, 'manfacturingorders')}
+                        {allowedRoles.workOrder.includes(user.role) &&
+                            renderNavLink('/workorders', 'Lệnh sản xuất', <GrUserWorker />, 'workorders')}
+                        {allowedRoles.unbuild.includes(user.role) &&
+                            renderNavLink('/unbuildorders', 'Hủy lệnh sản xuất', <MdInsertPageBreak />, 'unbuildorders')}
+                        {allowedRoles.scrap.includes(user.role) &&
+                            renderNavLink('/scrap', 'Lệnh gỡ bỏ', <IoTrashBinOutline />, 'scrap')}
+                        {allowedRoles.process.includes(user.role) &&
+                            renderNavLink('/productionprocess', 'Quy trình sản xuất', <AiOutlineRetweet />, 'productionprocess')}
+                    
+                        {allowedRoles.report.includes(user.role) &&
+                            renderNavLink('/reportings', 'Báo cáo sản xuất', <BsReception4 />, 'reportings')}
+                    </div>
                 )}
-
-                {productRole.includes(user.role) && (
-                    <NavLink
-                        onClick={() => setPage('products')}
-                        to="/products"
-                        className='btn-menu'
+                <div
+                    onClick={() => setOpenWarehouse(!openWarehouse)}
+                    className='btn-menu'
+                    style={{
+                        backgroundColor: '#3E58CE',
+                        color: '#ffffff',
+                        cursor: 'pointer',
+                        fontSize: 18,
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        paddingRight: '16px',
+                        marginTop: '5px'
+                    }}
+                >
+                    <span><FaWarehouse style={{ marginRight: 10 }} />Kho</span>
+                    <FaChevronDown
                         style={{
-                            backgroundColor: page === 'products' ? '#E4E7F2' : '#3E58CE',
-                            color: page === 'products' ? '#3348A9' : '#ffffff',
-                            fontSize: 18,
-                            textDecoration: 'none',
+                            transition: 'transform 0.3s ease',
+                            transform: openWarehouse ? 'rotate(180deg)' : 'rotate(0deg)'
                         }}
-                    >
-                        <MdProductionQuantityLimits />&emsp;
-                        Products
-                    </NavLink>
-                )}
+                    />
+                </div>
 
-                {manfacturingOrderRole.includes(user.role) && (
-                    <NavLink
-                        onClick={() => setPage('manfacturingorders')}
-                        to="/manfacturingorders"
-                        className='btn-menu'
-                        style={{
-                            backgroundColor: page === 'manfacturingorders' ? '#E4E7F2' : '#3E58CE',
-                            color: page === 'manfacturingorders' ? '#3348A9' : '#ffffff',
-                            fontSize: 18,
-                            textDecoration: 'none',
-                        }}
-                    >
-                        <GrPlan />&emsp;
-                        Manfacturing orders
-                    </NavLink>
-                )}
-
-                {workOrderRole.includes(user.role) && (
-                    <NavLink
-                        onClick={() => setPage('workorders')}
-                        to="/workorders"
-                        className='btn-menu'
-                        style={{
-                            backgroundColor: page === 'workorders' ? '#E4E7F2' : '#3E58CE',
-                            color: page === 'workorders' ? '#3348A9' : '#ffffff',
-                            fontSize: 18,
-                            textDecoration: 'none',
-                        }}
-
-                    >
-                        <GrUserWorker />&emsp;
-                        Work orders
-                    </NavLink>
-                )}
-
-                {unbuiltOrderRole.includes(user.role) && (
-                    <NavLink
-                        onClick={() => setPage('unbuildorders')}
-                        to="/unbuildorders"
-                        className='btn-menu'
-                        style={{
-                            backgroundColor: page === 'unbuildorders' ? '#E4E7F2' : '#3E58CE',
-                            color: page === 'unbuildorders' ? '#3348A9' : '#ffffff',
-                            fontSize: 18,
-                            textDecoration: 'none',
-                        }}
-                    >
-                        <MdInsertPageBreak />&emsp;
-                        Unbuild orders
-                    </NavLink>
-                )}
-
-                {scrapRole.includes(user.role) && (
-                    <NavLink
-                        onClick={() => setPage('scrap')}
-                        to="/scrap"
-                        className='btn-menu'
-                        style={{
-                            backgroundColor: page === 'scrap' ? '#E4E7F2' : '#3E58CE',
-                            color: page === 'scrap' ? '#3348A9' : '#ffffff',
-                            fontSize: 18,
-                            textDecoration: 'none',
-                        }}
-                    >
-                        <IoTrashBinOutline />&emsp;
-                        Scrap
-                    </NavLink>
-                )}
-
-                {productionProcessRole.includes(user.role) && (
-                    <NavLink
-                        onClick={() => setPage('productionprocess')}
-                        to="/productionprocess"
-                        className='btn-menu'
-                        style={{
-                            backgroundColor: page === 'productionprocess' ? '#E4E7F2' : '#3E58CE',
-                            color: page === 'productionprocess' ? '#3348A9' : '#ffffff',
-                            fontSize: 18,
-                            textDecoration: 'none',
-                        }}
-                    >
-                        <AiOutlineRetweet />&emsp;
-                        Production process
-                    </NavLink>
-                )}
-
-                {workCenterRole.includes(user.role) && (
-                    <NavLink
-                        onClick={() => setPage('workcenters')}
-                        to="/workcenters"
-                        className='btn-menu'
-                        style={{
-                            backgroundColor: page === 'workcenters' ? '#E4E7F2' : '#3E58CE',
-                            color: page === 'workcenters' ? '#3348A9' : '#ffffff',
-                            fontSize: 18,
-                            textDecoration: 'none',
-                        }}
-                    >
-                        <RiBuilding2Fill />&emsp;
-                        Work centers
-                    </NavLink>
-                )}
-
-                {reportRole.includes(user.role) && (
-                    <NavLink
-                        onClick={() => setPage('reportings')}
-                        to="/reportings"
-                        className='btn-menu'
-                        style={{
-                            backgroundColor: page === 'reportings' ? '#E4E7F2' : '#3E58CE',
-                            color: page === 'reportings' ? '#3348A9' : '#ffffff',
-                            fontSize: 18,
-                            textDecoration: 'none',
-                        }}
-                    >
-                        <BsReception4 />&emsp;
-                        Reportings
-                    </NavLink>
+                {openWarehouse && (
+                    <div className='submenu'>
+                        {allowedRoles.tonkho.includes(user.role) &&
+                            renderNavLink('/tonkho', 'Tồn kho vật liệu', <BsReception4 />, 'tonkho')}
+                    </div>
                 )}
             </div>
+
         </div>
+
     );
 };
 
-
-export default Menu
-
+export default Menu;

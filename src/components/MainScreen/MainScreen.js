@@ -17,7 +17,7 @@ import AddProcessForm from "./AddProcessForm"; // Thêm Import
 //import ActivityDetails from "./ActivityDetails";
 import ActivityList from "./ActivityList";
 import AddPlant from "./AddPlant"
-
+import TonKho from "./tonkho";
 const MainScreen = ({userName}) => {
     return (
         <div className="mainscreen_container">
@@ -36,7 +36,7 @@ const MainScreen = ({userName}) => {
                 <Route path="/reportings" element={<Reportings />} />
                 <Route path="/products/create" element={<CreateProduct />} />
                 <Route path="/manfacturing/detail" element={<ManfacturingDetail userName={userName}/>} />
-                
+                <Route path="/tonkho" element={<TonKho />} />
                 <Route path="/activities/:processId" element={<ActivityList />} />
                 <Route path="/add-process" element={<AddProcessForm />} />
                 <Route path="/manfacturingorders/create" element={<AddPlant userName={userName}/>} />

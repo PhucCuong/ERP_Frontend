@@ -229,18 +229,20 @@ const ActivityList = () => {
                                         ) : "Không có file"}
                                     </td>
                                     <td className="action-buttons">
-                                        <button
-                                            className="edit-btn"
-                                            onClick={() => handleEdit(activity)}
-                                        >
-                                            Sửa
-                                        </button>
-                                        <button
-                                            className="delete-btn"
-                                            onClick={() => handleDelete(activity)}
-                                        >
-                                            Xóa
-                                        </button>
+                                        <div style={{display: 'flex'}}>
+                                            <button
+                                                className="edit-btn"
+                                                onClick={() => handleEdit(activity)}
+                                            >
+                                                Sửa
+                                            </button>
+                                            <button
+                                                className="delete-btn"
+                                                onClick={() => handleDelete(activity)}
+                                            >
+                                                Xóa
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))
