@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import "./tonkho.css"; // Nếu có CSS riêng cho bảng
+import "./tonkho.css";
+import BoSungNVL from "./BoSungNVL";
 
 const TonKho = () => {
   const [rawMaterials, setRawMaterials] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [search, setSearch] = useState("");
+  const [showForm, setShowForm] = useState(false);
+  const [selectedMaterial, setSelectedMaterial] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -22,11 +25,20 @@ const TonKho = () => {
     fetchData();
   }, []);
 
+  const handleBoSungClick = (material) => {
+    setSelectedMaterial(material);
+    setShowForm(true);
+  };
+
+  const handleCloseForm = () => {
+    setShowForm(false);
+    setSelectedMaterial(null);
+  };
+
   return (
     <div className="raw-materials-container">
       <h2>Danh sách Tồn Kho Nguyên Vật Liệu</h2>
 
-      {/* Tìm kiếm */}
       <div className="raw-materials-search">
         <input
           type="text"
@@ -47,19 +59,24 @@ const TonKho = () => {
               <th>Số Lượng Tối Đa</th>
               <th>Đơn Vị</th>
               <th>Trạng Thái</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan="6">Đang tải...</td>
+                <td colSpan="7">Đang tải...</td>
               </tr>
             ) : error ? (
               <tr>
-                <td colSpan="6" className="error-message">{error}</td>
+                <td colSpan="7" className="error-message">{error}</td>
               </tr>
             ) : (
-              rawMaterials.map((material) => (
+              rawMaterials
+                .filter((material) =>
+                  material.tenNguyenVatLieu.toLowerCase().includes(search.toLowerCase())
+                )
+                .map((material) => (
                   <tr key={material.id}>
                     <td>{material.tenNguyenVatLieu}</td>
                     <td>{material.tonKhoHienCo}</td>
@@ -73,13 +90,29 @@ const TonKho = () => {
                         <span style={{ color: "green" }}>Đủ</span>
                       )}
                     </td>
+                    <td>
+                      {material.tonKhoHienCo < material.tonKhoToiThieu && (
+                        <button
+                          onClick={() => handleBoSungClick(material)}
+                          className="bo-sung-link"
+                        >
+                          ➕ Bổ sung hàng
+                        </button>
+                      )}
+                    </td>
                   </tr>
                 ))
             )}
           </tbody>
         </table>
       </div>
+
+      {/* Hiển thị form bổ sung nếu người dùng chọn */}
+      {showForm && selectedMaterial && (
+        <BoSungNVL selectedMaterial={selectedMaterial} onClose={handleCloseForm} />
+      )}
     </div>
   );
 };
+
 export default TonKho;

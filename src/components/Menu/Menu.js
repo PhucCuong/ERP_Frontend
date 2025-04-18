@@ -116,7 +116,8 @@ const Menu = ({ setUserName }) => {
                             renderNavLink('/products', 'Sản phẩm', <MdProductionQuantityLimits />, 'products')}
                                 {allowedRoles.workCenter.includes(user.role) &&
                             renderNavLink('/workcenters', 'Nhà máy', <RiBuilding2Fill />, 'workcenters')}
-                            
+                            {allowedRoles.workCenter.includes(user.role) &&
+                            renderNavLink('/NhaCungCap', 'Nhà cung cấp', <RiBuilding2Fill />, 'NhaCungCap')}
                     </div>
                 )}
                 <div

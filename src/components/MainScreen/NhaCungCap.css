@@ -1,0 +1,164 @@
+/* NhaCungCap.css */
+
+/* Cơ bản */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f9fafb;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Container chính */
+  .p-6 {
+    padding: 24px;
+  }
+  
+  .max-w-6xl {
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+  
+  /* Nút toggle form */
+  .ncc-toggle-btn {
+    background-color: #2563eb;
+    color: white;
+    font-weight: 500;
+    padding: 10px 20px;
+    border-radius: 8px;
+    margin-bottom: 24px;
+    transition: background-color 0.2s ease;
+    display: inline-block;
+  }
+  
+  .ncc-toggle-btn:hover {
+    background-color: #1d4ed8;
+  }
+  
+  /* Form hiển thị */
+  .ncc-form {
+    display: none;
+    background-color: #f0f9ff;
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    margin-bottom: 32px;
+  }
+  
+  .ncc-form.show {
+    display: block;
+  }
+  
+  /* Form input styling */
+  .ncc-form input,
+  .ncc-form select,
+  .ncc-form textarea {
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 10px 14px;
+    width: 100%;
+    background-color: white;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    margin-bottom: 16px;
+    font-size: 16px;
+  }
+  
+  /* Focus style */
+  .ncc-form input:focus,
+  .ncc-form select:focus,
+  .ncc-form textarea:focus {
+    border-color: #3b82f6;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  }
+  
+  /* Submit button */
+  .ncc-form button[type="submit"] {
+    background-color: #2563eb;
+    color: white;
+    font-weight: 600;
+    padding: 12px 24px;
+    border-radius: 8px;
+    margin-top: 12px;
+    transition: background-color 0.2s ease;
+  }
+  
+  .ncc-form button[type="submit"]:hover {
+    background-color: #1e40af;
+  }
+  
+  /* Table tổng thể */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+  
+  /* Header */
+  table thead {
+    background-color: #eff6ff;
+  }
+  
+  table th {
+    padding: 14px;
+    border-bottom: 2px solid #e5e7eb;
+    font-weight: 600;
+    text-align: center; /* Căn giữa mặc định */
+  }
+  
+  /* Cột đầu tiên của tiêu đề căn trái */
+  table th:first-child {
+    text-align: left;
+  }
+  
+  /* Body */
+  table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid #e5e7eb;
+    vertical-align: middle;
+    font-size: 15px;
+    color: #374151;
+    text-align: center; /* Căn giữa mặc định */
+  }
+  
+  /* Cột đầu tiên của nội dung căn trái */
+  table td:first-child {
+    text-align: left;
+  }
+  
+  /* Hover hiệu ứng */
+  table tbody tr:hover {
+    background-color: #f0f9ff;
+  }
+  
+  /* Button chung trong bảng */
+  table button {
+    padding: 8px 14px;
+    font-weight: 500;
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
+    font-size: 14px;
+  }
+  
+  /* Nút sửa */
+  button.bg-yellow-400 {
+    background-color: #facc15;
+    color: black;
+  }
+  
+  button.bg-yellow-400:hover {
+    background-color: #eab308;
+  }
+  
+  /* Nút xóa */
+  button.bg-red-500 {
+    background-color: #ef4444;
+    color: white;
+  }
+  
+  button.bg-red-500:hover {
+    background-color: #dc2626;
+  }
+  

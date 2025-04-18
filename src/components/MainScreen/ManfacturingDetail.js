@@ -333,7 +333,7 @@ const AddWorkOrderModal = ({ setIsOpenModal, maKeHoach, maSanPham, userName, set
         maKeHoach: '',
         maQuyTrinh: '',
         maSanPham: '',
-        soLuong: '',
+        soLuong: 0,
         ngayBatDau: '',
         ngayKetThuc: '',
         trangThai: 'Ready',
@@ -421,9 +421,11 @@ const AddWorkOrderModal = ({ setIsOpenModal, maKeHoach, maSanPham, userName, set
             nguoiChiuTrachNhiem: userName
         };
 
+        console.log(formSunmit)
+
         try {
-            const res = await axios.post('https://localhost:7135/api/LenhSanXuatx', formSunmit);
-            notify_success("Thêm lệnh sản xuất thành công!");
+            const res = await axios.post('https://localhost:7135/api/LenhSanXuatx/add-list-workorder', formSunmit);
+            notify_success("Thêm các lệnh sản xuất thành công!");
             setLoading(false);
 
             const result = await axios.get('https://localhost:7135/api/LenhSanXuatx');
@@ -510,12 +512,20 @@ const AddWorkOrderModal = ({ setIsOpenModal, maKeHoach, maSanPham, userName, set
                     </label>
 
                     <label>Khu Vực Sản Xuất:
-                        <select name="maNhaMay" value={formData.khuVucSanXuat} onChange={handleChange} required>
+                        <select
+                            name="khuVucSanXuat"
+                            value={formData.khuVucSanXuat}
+                            onChange={handleChange}
+                            required
+                        >
                             <option value="">-- Chọn Nhà Máy --</option>
                             {factorys.map(nm => (
-                                <option key={nm.maNhaMay} value={nm.maNhaMay}>{nm.tenNhaMay}</option>
+                                <option key={nm.maNhaMay} value={nm.maNhaMay}>
+                                    {nm.tenNhaMay}
+                                </option>
                             ))}
-                        </select><br />
+                        </select>
+                        <br />
                     </label>
                 </div>
 
