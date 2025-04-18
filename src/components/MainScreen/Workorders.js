@@ -105,8 +105,8 @@ const Workorders = () => {
                                 onMouseEnter={() => setHoveredRowIndex(index)}
                                 onMouseLeave={() => setHoveredRowIndex(null)}
                             >
-                                <td title={item.maKeHoach}>{item.maLenh.slice(0, 18)}...</td>
-                                <td className='blue-color'>{item.maKeHoach}</td>
+                                <td title={item.maKeHoach}>{item.maLenh.slice(0, 18)}</td>
+                                <td className='blue-color'>KHSX/{item.maKeHoach.toString().padStart(5, '0')}</td>
                                 <td>{filterProductIdToName(item.maSanPham)}</td>
                                 <td style={{width: 200}}>{filterProcessIdToName(item.maQuyTrinh)}</td>
                                 <td>{item.soLuong}</td>

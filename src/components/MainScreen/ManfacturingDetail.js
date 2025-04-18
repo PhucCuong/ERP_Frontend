@@ -6,7 +6,7 @@ import './ManfacturingDetail.css'
 import Spinner from 'react-bootstrap/Spinner';
 import { ToastContainer, toast } from 'react-toastify';
 import { FaRegTrashAlt } from "react-icons/fa";
-import { Link } from 'react-router-dom';
+
 const ManfacturingDetail = ({ userName }) => {
 
     const navigate = useNavigate();
@@ -17,17 +17,13 @@ const ManfacturingDetail = ({ userName }) => {
     // list call api
     const [bomList, setBomList] = useState(null)
     const [materials, setMaterials] = useState(null)
-    const [processList, setProcessList] = useState(null)
-    const [productList, setProductList] = useState(null)
+
 
     // biến để lấy định mức nguyên vật liệu của MỘT sản phẩm đó
     const [components, setComponents] = useState([])
     // nhận tham số truyền vào
     const location = useLocation();
     const item = location.state?.item;
-
-    // biến lưu lệnh sản xuất từ api về tạm trước khi lọc lại
-    const [workOrderList, setWorkOrderList] = useState([])
 
     // biến lưu danh sách lệnh sản xuất
     const [workOrders, setWorkOrders] = useState([])
@@ -40,16 +36,19 @@ const ManfacturingDetail = ({ userName }) => {
     const [isShowDeleteModal, setIsShowDeleteModal] = useState(false)
     // biến lưu mã lệnh sản xuát bị xóa để truyền vào modal delete
     const [workOrderDeleteId, setWorkOrderDeleteId] = useState('')
-    const [filteredProcesses, setFilteredProcesses] = useState([]);
+
+    //const [filteredProcesses, setFilteredProcesses] = useState([]);
+    const [lenhSanXuat, setLenhSanXuat] = useState([])
+
     useEffect(() => {
         setProductId(item.maSanPham)
         callApiGetBomList()
         callApiGetMaterials()
         setComponents([])
-        callApiGetWorkOrders()
-        filterWorkOrder()
-        callApiGetProcessList()
-        callApiGetProductList()
+
+
+        // gọi workorder đã được lọc theo plant từ backend
+        callGetWorkOrderListByPlantCode()
     }, [])
 
     useEffect(() => {
@@ -68,9 +67,15 @@ const ManfacturingDetail = ({ userName }) => {
         }
     }, [bomList, materials])
 
-    useEffect(() => {
-        filterWorkOrder(item.maKeHoach)
-    }, [workOrderList])
+    const callGetWorkOrderListByPlantCode = () => {
+        axios.get(`https://localhost:7135/api/LenhSanXuatx/get-workorder-list-by-plant-code/${Number(item.maKeHoach.substring(5,10))}`)
+            .then(response => {
+                setLenhSanXuat(response.data)
+            })
+            .catch(error => {
+                console.log(error)
+            })
+    }
 
     const callApiGetBomList = () => {
         axios.get('https://localhost:7135/api/DinhMucNguyenVatLieux')
@@ -92,46 +97,9 @@ const ManfacturingDetail = ({ userName }) => {
             })
     }
 
-
-    const callApiGetWorkOrders = () => {
-
-        axios.get('https://localhost:7135/api/LenhSanXuatx')
-            .then(response => {
-                setWorkOrderList(response.data)
-            })
-            .catch(error => {
-                console.log(error)
-            })
-    }
-
-    const callApiGetProcessList = () => {
-        axios.get('https://localhost:7135/api/QuyTrinhSanXuatx')
-            .then(response => {
-                setProcessList(response.data)
-            })
-            .catch(error => {
-                console.log(error)
-            })
-    }
-
-    const callApiGetProductList = () => {
-        axios.get('https://localhost:7135/api/SanPhamx')
-            .then(response => {
-                setProductList(response.data)
-            })
-            .catch(error => {
-                console.log(error)
-            })
-    }
-
     // biến makehoach từ 4 thành 'KHSX/00004'
     function formatMaKeHoach(number) {
         return `KHSX/${number.toString().padStart(5, '0')}`;
-    }
-
-    const filterWorkOrder = (makehoach) => {
-        var list = workOrderList.filter(wo => formatMaKeHoach(wo.maKeHoach) === makehoach)
-        setWorkOrders(list)
     }
 
     const clickBackManfacturingOrders = () => {
@@ -233,10 +201,12 @@ const ManfacturingDetail = ({ userName }) => {
                 <thead>
                     <tr className='man-det-table-title'>
                         <th className='man-det-th'>Work Orders Code</th>
+                        <th className='man-det-th'> Work Orders Name</th>
                         <th className='man-det-th'>Plan Code</th>
-                        <th className='man-det-th'>Process</th>
+                        <th className='man-det-th'>Process Name</th>
                         <th className='man-det-th'>Product</th>
                         <th className='man-det-th'>Quantity</th>
+                        <th className='man-det-th'>Work Center</th>
                         <th className='man-det-th'>Start date</th>
                         <th className='man-det-th'>End date</th>
                         <th className='man-det-th'>Real duration</th>
@@ -248,37 +218,20 @@ const ManfacturingDetail = ({ userName }) => {
 
                 <tbody>
                     {
-                        workOrders.map((llv, index) => {
+                        lenhSanXuat.map((llv, index) => {
                             return (
                                 <tr style={{ backgroundColor: index % 2 !== 0 ? '#EFEFEF' : '#FFFFFF' }}>
                                     <td title={llv.maLenh} style={{ width: 150, cursor: 'pointer', color: '#3E58CE' }} className='man-det-td' >{llv.maLenh}</td>
-                                    <td title={llv.maKeHoach} style={{ width: 150, cursor: 'pointer', color: '#3E58CE' }} className='man-det-td' >{item.maKeHoach}</td>
-                                    <td className='man-det-td' style={{ width: 150 }}>
-                                        {(() => {
-                                            if (processList !== null) {
-                                                const object = processList.find(p => p.maQuyTrinh === llv.maQuyTrinh);
-                                                return object ? (
-                                                    <Link
-                                                        to={`/activities/${llv.maQuyTrinh}`}
-                                                        style={{ textDecoration: 'none' }}
-                                                        className="link-process"
-                                                    >
-                                                        {object.tenQuyTrinh}
-                                                    </Link>
-                                                ) : "";
-                                            }
-                                        })()}
-                                    </td>
-
+                                    <td title={llv.tenHoatDong} style={{ width: 150, cursor: 'pointer', color: '#3E58CE' }} className='man-det-td' >{llv.tenHoatDong}</td>
+                                    <td title={llv.maKeHoach} style={{ width: 150, cursor: 'pointer', color: '#3E58CE' }} className='man-det-td' >KHSX/{llv.maKeHoach.toString().padStart(5,'0')}</td>
+                                    <td title={llv.tenQuyTrinh} style={{ width: 150, cursor: 'pointer', color: '#3E58CE' }} className='man-det-td' >{llv.tenQuyTrinh}</td>
                                     <td className='man-det-td' style={{ width: 200 }}>
-                                        {(() => {
-                                            if (productList !== null) {
-                                                var object = productList.filter(p => p.maSanPham === llv.maSanPham)[0];
-                                                return object ? object.tenSanPham : "";
-                                            }
-                                        })()}
+                                        {
+                                            llv.tenSanPham
+                                        }
                                     </td>
                                     <td className='man-det-td' >{llv.soLuong}</td>
+                                    <td className='man-det-td' >{llv.khuVucSanXuat}</td>
                                     <td className='man-det-td' style={{ width: 100, color: '#FF3399' }}>{llv.ngayBatDau.slice(0, 10)}</td>
                                     <td className='man-det-td' style={{ width: 100, color: '#FF3399' }}>{llv.ngayKetThuc.slice(0, 10)}</td>
                                     <td className='man-det-td' ></td>
@@ -305,7 +258,11 @@ const ManfacturingDetail = ({ userName }) => {
                                         </div>
                                     </td>
                                     <td>
-                                        <button className='md-delete-btn' onClick={() => deleteWorkOrder(llv.maLenh)}><FaRegTrashAlt /></button>
+                                        <button className='md-delete-btn' onClick={() => deleteWorkOrder(llv.maLenh)}
+                                            style={{
+                                                backgroundColor: (index % 2 !== 0) ? '#ffffff' : '#F0F0F0'
+                                            }}
+                                        ><FaRegTrashAlt /></button>
                                     </td>
                                 </tr>
                             )
@@ -316,19 +273,19 @@ const ManfacturingDetail = ({ userName }) => {
             </table>
 
             {isOpenModal && <AddWorkOrderModal setIsOpenModal={setIsOpenModal} maKeHoach={item.maKeHoach}
-                maSanPham={item.maSanPham} userName={userName} setWorkOrders={setWorkOrders} setWorkOrderList={setWorkOrderList}
+                maSanPham={item.maSanPham} userName={userName} setLenhSanXuat={setLenhSanXuat}
             />
             }
             {
                 isShowDeleteModal && <ConfirmDeleteModal setIsShowDeleteModal={setIsShowDeleteModal}
-                    workOrderDeleteId={workOrderDeleteId} setWorkOrders={setWorkOrders} setWorkOrderList={setWorkOrderList} maKeHoach={item.maKeHoach}
+                    workOrderDeleteId={workOrderDeleteId} setLenhSanXuat={setLenhSanXuat} maKeHoach={item.maKeHoach}
                 />
             }
         </div>
     )
 }
 
-const AddWorkOrderModal = ({ setIsOpenModal, maKeHoach, maSanPham, userName, setWorkOrders, setWorkOrderList }) => {
+const AddWorkOrderModal = ({ setIsOpenModal, maKeHoach, maSanPham, userName, setLenhSanXuat }) => {
     const [formData, setFormData] = useState({
         maKeHoach: '',
         maQuyTrinh: '',
@@ -340,7 +297,7 @@ const AddWorkOrderModal = ({ setIsOpenModal, maKeHoach, maSanPham, userName, set
         nguoiChiuTrachNhiem: '',
         khuVucSanXuat: '',
     });
-
+    console.log(maKeHoach)
     const [loading, setLoading] = useState(false);
     const [plants, setPlant] = useState([]);
     const [processes, setProcesses] = useState([]);
@@ -428,11 +385,8 @@ const AddWorkOrderModal = ({ setIsOpenModal, maKeHoach, maSanPham, userName, set
             notify_success("Thêm các lệnh sản xuất thành công!");
             setLoading(false);
 
-            const result = await axios.get('https://localhost:7135/api/LenhSanXuatx');
-            setWorkOrderList(result.data);
-
-            const filtered = result.data.filter(item => item.maKeHoach === maKeHoach);
-            setWorkOrders(filtered);
+            const result = await axios.get(`https://localhost:7135/api/LenhSanXuatx/get-workorder-list-by-plant-code/${Number(maKeHoach.substring(5,10))}`);
+            setLenhSanXuat(result.data);
 
             setTimeout(() => {
                 setIsOpenModal(false);
@@ -520,7 +474,7 @@ const AddWorkOrderModal = ({ setIsOpenModal, maKeHoach, maSanPham, userName, set
                         >
                             <option value="">-- Chọn Nhà Máy --</option>
                             {factorys.map(nm => (
-                                <option key={nm.maNhaMay} value={nm.maNhaMay}>
+                                <option key={nm.maNhaMay} value={nm.tenNhaMay}>
                                     {nm.tenNhaMay}
                                 </option>
                             ))}
@@ -548,7 +502,7 @@ const AddWorkOrderModal = ({ setIsOpenModal, maKeHoach, maSanPham, userName, set
 const notify_success = (message) => toast.info(message, { type: "success" });
 const notify_error = (message) => toast.info(message, { type: "error" });
 
-const ConfirmDeleteModal = ({ setIsShowDeleteModal, workOrderDeleteId, setWorkOrders, setWorkOrderList, maKeHoach }) => {
+const ConfirmDeleteModal = ({ setIsShowDeleteModal, workOrderDeleteId, setLenhSanXuat, maKeHoach }) => {
 
     const [loading, setLoading] = useState(false);
 
@@ -564,12 +518,8 @@ const ConfirmDeleteModal = ({ setIsShowDeleteModal, workOrderDeleteId, setWorkOr
 
             // rerender lại table work order
             // gọi lại API để lấy work order mới nhất
-            const result = await axios.get('https://localhost:7135/api/LenhSanXuatx');
-            setWorkOrderList(result.data);
-
-            // filter lại sau khi có danh sách mới
-            const filtered = result.data.filter(item => item.maKeHoach === maKeHoach);
-            setWorkOrders(filtered); // <<< thêm dòng này để cập nhật render
+            const result = await axios.get(`https://localhost:7135/api/LenhSanXuatx/get-workorder-list-by-plant-code/${Number(maKeHoach.substring(5,10))}`);
+            setLenhSanXuat(result.data);
         } catch (err) {
             setLoading(false);
 
