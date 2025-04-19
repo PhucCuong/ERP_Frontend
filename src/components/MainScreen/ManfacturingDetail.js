@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { IoMdClose } from "react-icons/io";
 import axios from 'axios';
 import './ManfacturingDetail.css'
@@ -68,7 +68,7 @@ const ManfacturingDetail = ({ userName }) => {
     }, [bomList, materials])
 
     const callGetWorkOrderListByPlantCode = () => {
-        axios.get(`https://localhost:7135/api/LenhSanXuatx/get-workorder-list-by-plant-code/${Number(item.maKeHoach.substring(5,10))}`)
+        axios.get(`https://localhost:7135/api/LenhSanXuatx/get-workorder-list-by-plant-code/${Number(item.maKeHoach.substring(5, 10))}`)
             .then(response => {
                 setLenhSanXuat(response.data)
             })
@@ -114,6 +114,36 @@ const ManfacturingDetail = ({ userName }) => {
         setWorkOrderDeleteId(work_order_delete_id)
         setIsShowDeleteModal(true)
     }
+
+    // code nhấn nút bắt đầu , tạm dừng, kết thúc
+
+    const convertMinutesToMinutesSeconds = (minutes) => {
+        const totalSeconds = Math.floor(minutes * 60);
+        const mins = Math.floor(totalSeconds / 60);
+        const secs = totalSeconds % 60;
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    const [timers, setTimers] = useState({}); // Ví dụ: { 'maLenh001': 'running', 'maLenh002': 'paused' }
+
+    const handleStart = (maLenh) => {
+        setTimers(prev => ({ ...prev, [maLenh]: true }));
+    };
+
+    const handlePause = (maLenh) => {
+        setTimers(prev => ({ ...prev, [maLenh]: false }));
+    };
+
+    const handleStop = (maLenh) => {
+        setTimers(prev => ({ ...prev, [maLenh]: 'stopped' }));
+    };
+
+    const handleStoppedTime = (maLenh, totalSeconds) => {
+        const minutes = Math.floor(totalSeconds / 60);
+        console.log(`⏱ [${maLenh}] Thời gian thực tế: ${minutes} phút`);
+
+        // Gửi API cập nhật nếu cần
+    };
 
     return (
         <div>
@@ -171,9 +201,9 @@ const ManfacturingDetail = ({ userName }) => {
             <table className='man-det-table'>
                 <thead>
                     <tr className='man-det-table-title'>
-                        <th className='man-det-th'>Component</th>
-                        <th className='man-det-th'>To Comsume</th>
-                        <th className='man-det-th'>Unit</th>
+                        <th className='man-det-th'>Thành phần</th>
+                        <th className='man-det-th'>Số lượng</th>
+                        <th className='man-det-th'>Đơn vị tính</th>
                     </tr>
                 </thead>
 
@@ -200,31 +230,37 @@ const ManfacturingDetail = ({ userName }) => {
             <table className='man-det-table'>
                 <thead>
                     <tr className='man-det-table-title'>
-                        <th className='man-det-th'>Work Orders Code</th>
-                        <th className='man-det-th'> Work Orders Name</th>
-                        <th className='man-det-th'>Plan Code</th>
+                        <th className='man-det-th'>Mã sản xuất</th>
+                        <th className='man-det-th'>Lệnh sản xuất</th>
+                        <th className='man-det-th'>Mã kế hoạch</th>
                         {/* <th className='man-det-th'>Process Name</th> */}
-                        <th className='man-det-th'>Product</th>
-                        <th className='man-det-th'>Quantity</th>
-                        <th className='man-det-th'>Work Center</th>
-                        <th className='man-det-th'>Start date</th>
-                        <th className='man-det-th'>End date</th>
-                        <th className='man-det-th'>Real duration</th>
-                        <th className='man-det-th'>Manufacturing Supervisor</th>
-                        <th className='man-det-th'>Status</th>
-                        <th className='man-det-th'>Action</th>
-                        <th className='man-det-th'>Delete</th>
+                        <th className='man-det-th'>Sản phẩm</th>
+                        <th className='man-det-th'>Số lượng</th>
+                        <th className='man-det-th'>Nhà máy</th>
+                        <th className='man-det-th'>Ngày bắt đầu</th>
+                        <th className='man-det-th'>Ngày kết thúc</th>
+                        <th className='man-det-th'>Thời gian dự kiến</th>
+                        <th className='man-det-th'>Thời gian Thực tế</th>
+                        <th className='man-det-th'>Người kí</th>
+                        <th className='man-det-th'>Trạng thái</th>
+                        <th className='man-det-th'>Thaop tác</th>
+                        <th className='man-det-th'>Xóa</th>
                     </tr>
                 </thead>
 
                 <tbody>
                     {
                         lenhSanXuat.map((llv, index) => {
+
+                            // const previousTrangThai = index > 0 ? lenhSanXuat[index - 1].trangThai : null;
+                            // console.log(`index Hiện tại: ${index} | Trước đó: ${previousTrangThai}`);
+                            // sau khi nhấn một nút acction cập nhật trạng thái status và gọi lại api để cập nhật bảng
+
                             return (
                                 <tr style={{ backgroundColor: index % 2 !== 0 ? '#EFEFEF' : '#FFFFFF' }}>
                                     <td title={llv.maLenh} style={{ width: 150, cursor: 'pointer', color: '#3E58CE' }} className='man-det-td' >{llv.maLenh}</td>
-                                    <td title={llv.tenHoatDong} style={{ width: 150, cursor: 'pointer', color: '#3E58CE', width:'15%'}} className='man-det-td' >{llv.tenHoatDong}</td>
-                                    <td title={llv.maKeHoach} style={{ width: 150, cursor: 'pointer', color: '#3E58CE' }} className='man-det-td' >KHSX/{llv.maKeHoach.toString().padStart(5,'0')}</td>
+                                    <td title={llv.tenHoatDong} style={{ width: 150, cursor: 'pointer', color: '#3E58CE', width: '15%' }} className='man-det-td' >{llv.tenHoatDong}</td>
+                                    <td title={llv.maKeHoach} style={{ width: 150, cursor: 'pointer', color: '#3E58CE' }} className='man-det-td' >KHSX/{llv.maKeHoach.toString().padStart(5, '0')}</td>
                                     {/* <td title={llv.tenQuyTrinh} style={{ width: 150, cursor: 'pointer', color: '#3E58CE' }} className='man-det-td' >{llv.tenQuyTrinh}</td> */}
                                     <td className='man-det-td' style={{ width: 200 }}>
                                         {
@@ -232,10 +268,17 @@ const ManfacturingDetail = ({ userName }) => {
                                         }
                                     </td>
                                     <td className='man-det-td' >{llv.soLuong}</td>
-                                    <td className='man-det-td' style={{width: '15%'}}>{llv.khuVucSanXuat}</td>
-                                    <td className='man-det-td' style={{ width: 100, color: '#FF3399' }}>{llv.ngayBatDau.slice(0, 10)}</td>
-                                    <td className='man-det-td' style={{ width: 100, color: '#FF3399' }}>{llv.ngayKetThuc.slice(0, 10)}</td>
-                                    <td className='man-det-td' ></td>
+                                    <td className='man-det-td' style={{ width: '15%' }}>{llv.khuVucSanXuat}</td>
+                                    <td className='man-det-td' style={{ color: '#FF3399' }}>{llv.ngayBatDau}</td>
+                                    <td className='man-det-td' style={{ color: '#FF3399' }}>{llv.ngayKetThuc}</td>
+                                    <td className='man-det-td' style={{ width: '10%' }}>{convertMinutesToMinutesSeconds(llv.thoiGianDuKien)}</td>
+                                    <td className='man-det-td' style={{ width: '10%' }}>
+                                        <ThoiGianThucTeCell
+                                            initialMinutes={llv.thoiGianThucTe}
+                                            isRunning={timers[llv.maLenh]} // true / false / 'stopped'
+                                            onStop={(totalSeconds) => handleStoppedTime(llv.maLenh, totalSeconds)}
+                                        />
+                                    </td>
                                     <td className='man-det-td' style={{ color: '#18A2B8', fontWeight: 'bold' }}>{llv.nguoiChiuTrachNhiem}</td>
                                     <td className='man-det-td' >
                                         <div
@@ -249,7 +292,7 @@ const ManfacturingDetail = ({ userName }) => {
                                                             : llv.trangThai === "Block"
                                                                 ? "#BB0000"
                                                                 : llv.trangThai === "Done" ? "#339900"
-                                                                : "#808000", // Màu mặc định nếu không khớp
+                                                                    : "#808000", // Màu mặc định nếu không khớp
                                                 color: "white", // Đổi màu chữ để dễ đọc hơn
                                                 fontWeight: "bold", // Làm nổi bật chữ
                                                 textAlign: "center", // Căn giữa nội dung
@@ -265,10 +308,10 @@ const ManfacturingDetail = ({ userName }) => {
                                     </td>
                                     <td className='man-det-td' >
                                         {
-                                            llv.trangThai === "Ready" ? <ReadyState/> : 
-                                            llv.trangThai === "Inprogress" ? <InprogressState/> : 
-                                            llv.trangThai === "Pause" ? <PauseState/> : 
-                                            llv.trangThai === "Block" ? <BlockState/> : <div></div>
+                                            llv.trangThai === "Ready" ? <ReadyState handleStart={handleStart} maLenh={llv.maLenh}/> :
+                                                llv.trangThai === "Inprogress" ? <InprogressState handlePause={handlePause} handleStop={handleStop} maLenh={llv.maLenh}/> :
+                                                    llv.trangThai === "Pause" ? <PauseState handleStart={handleStart} handleStop={handleStop} maLenh={llv.maLenh}/> :
+                                                        llv.trangThai === "Block" ? <BlockState /> : <div></div>
                                         }
                                     </td>
                                     <td className='man-det-td' >
@@ -297,6 +340,44 @@ const ManfacturingDetail = ({ userName }) => {
             }
         </div>
     )
+}
+
+const ThoiGianThucTeCell = ({ initialMinutes = 0, isRunning, onStop }) => {
+    const [totalSeconds, setTotalSeconds] = useState(initialMinutes * 60);
+    const intervalRef = useRef(null);
+
+    // Start or pause timer
+    useEffect(() => {
+        if (isRunning) {
+            intervalRef.current = setInterval(() => {
+                setTotalSeconds(prev => prev + 1);
+            }, 1000);
+        } else {
+            clearInterval(intervalRef.current);
+        }
+
+        return () => clearInterval(intervalRef.current);
+    }, [isRunning]);
+
+    // Gửi kết quả ra ngoài nếu kết thúc
+    useEffect(() => {
+        if (isRunning === 'stopped') {
+            onStop && onStop(totalSeconds);
+            clearInterval(intervalRef.current);
+        }
+    }, [isRunning]);
+
+    const formatTime = () => {
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+        return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    };
+
+    return (
+        <td className='man-det-td' style={{ width: '10%' }}>
+            {formatTime()}
+        </td>
+    );
 }
 
 const AddWorkOrderModal = ({ setIsOpenModal, maKeHoach, maSanPham, userName, setLenhSanXuat }) => {
@@ -399,7 +480,7 @@ const AddWorkOrderModal = ({ setIsOpenModal, maKeHoach, maSanPham, userName, set
             notify_success("Thêm các lệnh sản xuất thành công!");
             setLoading(false);
 
-            const result = await axios.get(`https://localhost:7135/api/LenhSanXuatx/get-workorder-list-by-plant-code/${Number(maKeHoach.substring(5,10))}`);
+            const result = await axios.get(`https://localhost:7135/api/LenhSanXuatx/get-workorder-list-by-plant-code/${Number(maKeHoach.substring(5, 10))}`);
             setLenhSanXuat(result.data);
 
             setTimeout(() => {
@@ -533,7 +614,7 @@ const ConfirmDeleteModal = ({ setIsShowDeleteModal, workOrderDeleteId, setLenhSa
 
             // rerender lại table work order
             // gọi lại API để lấy work order mới nhất
-            const result = await axios.get(`https://localhost:7135/api/LenhSanXuatx/get-workorder-list-by-plant-code/${Number(maKeHoach.substring(5,10))}`);
+            const result = await axios.get(`https://localhost:7135/api/LenhSanXuatx/get-workorder-list-by-plant-code/${Number(maKeHoach.substring(5, 10))}`);
             setLenhSanXuat(result.data);
         } catch (err) {
             setLoading(false);
@@ -595,29 +676,29 @@ const ConfirmDeleteModal = ({ setIsShowDeleteModal, workOrderDeleteId, setLenhSa
     );
 };
 
-const ReadyState = () => {
+const ReadyState = ({handleStart, maLenh}) => {
     return (
         <div>
-            <button className='btn-action' style={{backgroundColor: '#33CCCC'}}>Start</button>
+            <button onClick={() => handleStart(maLenh)} className='btn-action' style={{ backgroundColor: '#33CCCC' }}>Start</button>
         </div>
     )
 }
 
-const InprogressState = () => {
+const InprogressState = ({handlePause, handleStop, maLenh}) => {
     return (
         <div>
-            <button className='btn-action' style={{backgroundColor: '#CCCC00', marginTop: 5}}>Pause</button>
-            <button className='btn-action' style={{backgroundColor: '#CC3333', marginTop: 5}}>Block</button>
-            <button className='btn-action' style={{backgroundColor: '#339900', marginTop: 5}}>Done</button>
+            <button onClick={() => handlePause(maLenh)} className='btn-action' style={{ backgroundColor: '#CCCC00', marginTop: 5 }}>Pause</button>
+            <button onClick={() => handleStop(maLenh)} className='btn-action' style={{ backgroundColor: '#CC3333', marginTop: 5 }}>Block</button>
+            <button onClick={() => handleStop(maLenh)} className='btn-action' style={{ backgroundColor: '#339900', marginTop: 5 }}>Done</button>
         </div>
     )
 }
 
-const PauseState = () => {
+const PauseState = ({handleStart, handleStop, maLenh}) => {
     return (
         <div>
-            <button className='btn-action' style={{backgroundColor: '#FFCC33', marginTop: 5}}>Continue</button>
-            <button className='btn-action' style={{backgroundColor: '#CC3333', marginTop: 5}}>Block</button>
+            <button onClick={() => handleStart(maLenh)} className='btn-action' style={{ backgroundColor: '#FFCC33', marginTop: 5 }}>Continue</button>
+            <button onClick={() => handleStop(maLenh)} className='btn-action' style={{ backgroundColor: '#CC3333', marginTop: 5 }}>Block</button>
         </div>
     )
 }
@@ -625,7 +706,7 @@ const PauseState = () => {
 const BlockState = () => {
     return (
         <div>
-            <button className='btn-action' style={{backgroundColor: '#009999', marginTop: 5}}>Return</button>
+            <button className='btn-action' style={{ backgroundColor: '#009999', marginTop: 5 }}>Return</button>
         </div>
     )
 }
