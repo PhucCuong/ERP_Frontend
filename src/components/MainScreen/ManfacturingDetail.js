@@ -203,7 +203,7 @@ const ManfacturingDetail = ({ userName }) => {
                         <th className='man-det-th'>Work Orders Code</th>
                         <th className='man-det-th'> Work Orders Name</th>
                         <th className='man-det-th'>Plan Code</th>
-                        <th className='man-det-th'>Process Name</th>
+                        {/* <th className='man-det-th'>Process Name</th> */}
                         <th className='man-det-th'>Product</th>
                         <th className='man-det-th'>Quantity</th>
                         <th className='man-det-th'>Work Center</th>
@@ -212,6 +212,7 @@ const ManfacturingDetail = ({ userName }) => {
                         <th className='man-det-th'>Real duration</th>
                         <th className='man-det-th'>Manufacturing Supervisor</th>
                         <th className='man-det-th'>Status</th>
+                        <th className='man-det-th'>Action</th>
                         <th className='man-det-th'>Delete</th>
                     </tr>
                 </thead>
@@ -222,16 +223,16 @@ const ManfacturingDetail = ({ userName }) => {
                             return (
                                 <tr style={{ backgroundColor: index % 2 !== 0 ? '#EFEFEF' : '#FFFFFF' }}>
                                     <td title={llv.maLenh} style={{ width: 150, cursor: 'pointer', color: '#3E58CE' }} className='man-det-td' >{llv.maLenh}</td>
-                                    <td title={llv.tenHoatDong} style={{ width: 150, cursor: 'pointer', color: '#3E58CE' }} className='man-det-td' >{llv.tenHoatDong}</td>
+                                    <td title={llv.tenHoatDong} style={{ width: 150, cursor: 'pointer', color: '#3E58CE', width:'15%'}} className='man-det-td' >{llv.tenHoatDong}</td>
                                     <td title={llv.maKeHoach} style={{ width: 150, cursor: 'pointer', color: '#3E58CE' }} className='man-det-td' >KHSX/{llv.maKeHoach.toString().padStart(5,'0')}</td>
-                                    <td title={llv.tenQuyTrinh} style={{ width: 150, cursor: 'pointer', color: '#3E58CE' }} className='man-det-td' >{llv.tenQuyTrinh}</td>
+                                    {/* <td title={llv.tenQuyTrinh} style={{ width: 150, cursor: 'pointer', color: '#3E58CE' }} className='man-det-td' >{llv.tenQuyTrinh}</td> */}
                                     <td className='man-det-td' style={{ width: 200 }}>
                                         {
                                             llv.tenSanPham
                                         }
                                     </td>
                                     <td className='man-det-td' >{llv.soLuong}</td>
-                                    <td className='man-det-td' >{llv.khuVucSanXuat}</td>
+                                    <td className='man-det-td' style={{width: '15%'}}>{llv.khuVucSanXuat}</td>
                                     <td className='man-det-td' style={{ width: 100, color: '#FF3399' }}>{llv.ngayBatDau.slice(0, 10)}</td>
                                     <td className='man-det-td' style={{ width: 100, color: '#FF3399' }}>{llv.ngayKetThuc.slice(0, 10)}</td>
                                     <td className='man-det-td' ></td>
@@ -244,20 +245,33 @@ const ManfacturingDetail = ({ userName }) => {
                                                     llv.trangThai === "Ready"
                                                         ? "#18A2B8"
                                                         : llv.trangThai === "Inprogress"
-                                                            ? "#FFFF66"
+                                                            ? "#CCCC33"
                                                             : llv.trangThai === "Block"
                                                                 ? "#BB0000"
-                                                                : "transparent", // Màu mặc định nếu không khớp
+                                                                : llv.trangThai === "Done" ? "#339900"
+                                                                : "#808000", // Màu mặc định nếu không khớp
                                                 color: "white", // Đổi màu chữ để dễ đọc hơn
                                                 fontWeight: "bold", // Làm nổi bật chữ
                                                 textAlign: "center", // Căn giữa nội dung
-                                                width: 50
+                                                width: 50,
+                                                display: 'flex',
+                                                justifyContent: 'center',
+                                                alignItems: 'center',
+                                                width: 100
                                             }}
                                         >
                                             {llv.trangThai}
                                         </div>
                                     </td>
-                                    <td>
+                                    <td className='man-det-td' >
+                                        {
+                                            llv.trangThai === "Ready" ? <ReadyState/> : 
+                                            llv.trangThai === "Inprogress" ? <InprogressState/> : 
+                                            llv.trangThai === "Pause" ? <PauseState/> : 
+                                            llv.trangThai === "Block" ? <BlockState/> : <div></div>
+                                        }
+                                    </td>
+                                    <td className='man-det-td' >
                                         <button className='md-delete-btn' onClick={() => deleteWorkOrder(llv.maLenh)}
                                             style={{
                                                 backgroundColor: (index % 2 !== 0) ? '#ffffff' : '#F0F0F0'
@@ -390,7 +404,7 @@ const AddWorkOrderModal = ({ setIsOpenModal, maKeHoach, maSanPham, userName, set
 
             setTimeout(() => {
                 setIsOpenModal(false);
-            }, 1000);
+            }, 500);
         } catch (err) {
             setLoading(false);
             console.error("Chi tiết lỗi:", err);
@@ -460,6 +474,7 @@ const AddWorkOrderModal = ({ setIsOpenModal, maKeHoach, maSanPham, userName, set
                         <select name="trangThai" value={formData.trangThai} onChange={handleChange}>
                             <option value="Ready">Ready</option>
                             <option value="Inprogress">Inprogress</option>
+                            <option value="Pause">Pause</option>
                             <option value="Block">Block</option>
                             <option value="Done">Done</option>
                         </select>
@@ -552,7 +567,7 @@ const ConfirmDeleteModal = ({ setIsShowDeleteModal, workOrderDeleteId, setLenhSa
         }
         setTimeout(() => {
             setIsShowDeleteModal(false)
-        }, 1000);
+        }, 500);
 
     };
 
@@ -579,6 +594,41 @@ const ConfirmDeleteModal = ({ setIsShowDeleteModal, workOrderDeleteId, setLenhSa
         </div>
     );
 };
+
+const ReadyState = () => {
+    return (
+        <div>
+            <button className='btn-action' style={{backgroundColor: '#33CCCC'}}>Start</button>
+        </div>
+    )
+}
+
+const InprogressState = () => {
+    return (
+        <div>
+            <button className='btn-action' style={{backgroundColor: '#CCCC00', marginTop: 5}}>Pause</button>
+            <button className='btn-action' style={{backgroundColor: '#CC3333', marginTop: 5}}>Block</button>
+            <button className='btn-action' style={{backgroundColor: '#339900', marginTop: 5}}>Done</button>
+        </div>
+    )
+}
+
+const PauseState = () => {
+    return (
+        <div>
+            <button className='btn-action' style={{backgroundColor: '#FFCC33', marginTop: 5}}>Continue</button>
+            <button className='btn-action' style={{backgroundColor: '#CC3333', marginTop: 5}}>Block</button>
+        </div>
+    )
+}
+
+const BlockState = () => {
+    return (
+        <div>
+            <button className='btn-action' style={{backgroundColor: '#009999', marginTop: 5}}>Return</button>
+        </div>
+    )
+}
 
 const styles = {
     overlay: {
