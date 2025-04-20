@@ -25,9 +25,6 @@ const ManfacturingDetail = ({ userName }) => {
     const location = useLocation();
     const item = location.state?.item;
 
-    // biến lưu danh sách lệnh sản xuất
-    const [workOrders, setWorkOrders] = useState([])
-
     // biến lưu trạng thái modal
     const [isOpenModal, setIsOpenModal] = useState(false)
 
@@ -67,8 +64,8 @@ const ManfacturingDetail = ({ userName }) => {
         }
     }, [bomList, materials])
 
-    const callGetWorkOrderListByPlantCode = () => {
-        axios.get(`https://localhost:7135/api/LenhSanXuatx/get-workorder-list-by-plant-code/${Number(item.maKeHoach.substring(5, 10))}`)
+    const callGetWorkOrderListByPlantCode = async () => {
+        await axios.get(`https://localhost:7135/api/LenhSanXuatx/get-workorder-list-by-plant-code/${Number(item.maKeHoach.substring(5, 10))}`)
             .then(response => {
                 setLenhSanXuat(response.data)
             })
@@ -98,7 +95,7 @@ const ManfacturingDetail = ({ userName }) => {
     }
 
     // biến makehoach từ 4 thành 'KHSX/00004'
-    function formatMaKeHoach(number) {
+    const formatMaKeHoach = (number) => {
         return `KHSX/${number.toString().padStart(5, '0')}`;
     }
 
@@ -117,6 +114,18 @@ const ManfacturingDetail = ({ userName }) => {
 
     // code nhấn nút bắt đầu , tạm dừng, kết thúc
 
+    const [realTime, setRealTime] = useState(0)
+
+    const parseLenhSx = (code) => {
+        const numberPart = code.replace('LSX/', '');
+        return parseInt(numberPart, 10);
+    };
+
+    function convertSecondsToDecimalMinutes(seconds) {
+        const decimalMinutes = seconds / 60;
+        return parseFloat(decimalMinutes.toFixed(2))
+    }
+
     const convertMinutesToMinutesSeconds = (minutes) => {
         const totalSeconds = Math.floor(minutes * 60);
         const mins = Math.floor(totalSeconds / 60);
@@ -126,16 +135,47 @@ const ManfacturingDetail = ({ userName }) => {
 
     const [timers, setTimers] = useState({}); // Ví dụ: { 'maLenh001': 'running', 'maLenh002': 'paused' }
 
-    const handleStart = (maLenh) => {
+    const callApiChangeStatus = async (maLenh, status , currentState) => {
+        var minutes
+        if(currentState === "Ready") {
+            minutes = 0
+        } else {
+            minutes = convertSecondsToDecimalMinutes(realTime)
+        }
+         
+        var makhint = parseLenhSx(maLenh)
+        const requestBody = {
+            maLenh: makhint,
+            trangThai: status,
+            thoiGianThucTe: minutes
+        }
+
+        try {
+            await axios.post('https://localhost:7135/api/LenhSanXuatx/update-status', requestBody)
+        } catch (ex) {
+            console.error('Lỗi khi gọi API:', ex);
+        }
+    }
+
+    const handleStart = async (maLenh, trangthaithaydoi, trangthaihientai) => {
         setTimers(prev => ({ ...prev, [maLenh]: true }));
+
+        await callApiChangeStatus(maLenh, trangthaithaydoi, trangthaihientai)
+        await callGetWorkOrderListByPlantCode()
     };
 
-    const handlePause = (maLenh) => {
+    const handlePause = async (maLenh,trangthaithaydoi, trangthaihientai) => {
         setTimers(prev => ({ ...prev, [maLenh]: false }));
+
+        await callApiChangeStatus(maLenh, trangthaithaydoi, trangthaihientai)
+        await callGetWorkOrderListByPlantCode()
     };
 
-    const handleStop = (maLenh) => {
+    const handleStop = async (maLenh, trangthaithaydoi, trangthaihientai) => {
         setTimers(prev => ({ ...prev, [maLenh]: 'stopped' }));
+
+        await callApiChangeStatus(maLenh, trangthaithaydoi, trangthaihientai)
+        await callGetWorkOrderListByPlantCode()
     };
 
     const handleStoppedTime = (maLenh, totalSeconds) => {
@@ -255,7 +295,6 @@ const ManfacturingDetail = ({ userName }) => {
                             // const previousTrangThai = index > 0 ? lenhSanXuat[index - 1].trangThai : null;
                             // console.log(`index Hiện tại: ${index} | Trước đó: ${previousTrangThai}`);
                             // sau khi nhấn một nút acction cập nhật trạng thái status và gọi lại api để cập nhật bảng
-
                             return (
                                 <tr style={{ backgroundColor: index % 2 !== 0 ? '#EFEFEF' : '#FFFFFF' }}>
                                     <td title={llv.maLenh} style={{ width: 150, cursor: 'pointer', color: '#3E58CE' }} className='man-det-td' >{llv.maLenh}</td>
@@ -277,6 +316,7 @@ const ManfacturingDetail = ({ userName }) => {
                                             initialMinutes={llv.thoiGianThucTe}
                                             isRunning={timers[llv.maLenh]} // true / false / 'stopped'
                                             onStop={(totalSeconds) => handleStoppedTime(llv.maLenh, totalSeconds)}
+                                            onTick={(totalSeconds) => setRealTime(totalSeconds)}
                                         />
                                     </td>
                                     <td className='man-det-td' style={{ color: '#18A2B8', fontWeight: 'bold' }}>{llv.nguoiChiuTrachNhiem}</td>
@@ -308,9 +348,9 @@ const ManfacturingDetail = ({ userName }) => {
                                     </td>
                                     <td className='man-det-td' >
                                         {
-                                            llv.trangThai === "Ready" ? <ReadyState handleStart={handleStart} maLenh={llv.maLenh}/> :
-                                                llv.trangThai === "Inprogress" ? <InprogressState handlePause={handlePause} handleStop={handleStop} maLenh={llv.maLenh}/> :
-                                                    llv.trangThai === "Pause" ? <PauseState handleStart={handleStart} handleStop={handleStop} maLenh={llv.maLenh}/> :
+                                            llv.trangThai === "Ready" ? <ReadyState handleStart={handleStart} maLenh={llv.maLenh} currentState={llv.trangThai}/> :
+                                                llv.trangThai === "Inprogress" ? <InprogressState handlePause={handlePause} handleStop={handleStop} maLenh={llv.maLenh} currentState={llv.trangThai}/> :
+                                                    llv.trangThai === "Pause" ? <PauseState handleStart={handleStart} handleStop={handleStop} maLenh={llv.maLenh} currentState={llv.trangThai}/> :
                                                         llv.trangThai === "Block" ? <BlockState /> : <div></div>
                                         }
                                     </td>
@@ -342,7 +382,7 @@ const ManfacturingDetail = ({ userName }) => {
     )
 }
 
-const ThoiGianThucTeCell = ({ initialMinutes = 0, isRunning, onStop }) => {
+const ThoiGianThucTeCell = ({ initialMinutes = 0, isRunning, onStop, onTick }) => {
     const [totalSeconds, setTotalSeconds] = useState(initialMinutes * 60);
     const intervalRef = useRef(null);
 
@@ -359,6 +399,10 @@ const ThoiGianThucTeCell = ({ initialMinutes = 0, isRunning, onStop }) => {
         return () => clearInterval(intervalRef.current);
     }, [isRunning]);
 
+    useEffect(() => {
+        onTick && onTick(totalSeconds);
+    }, [totalSeconds]);
+
     // Gửi kết quả ra ngoài nếu kết thúc
     useEffect(() => {
         if (isRunning === 'stopped') {
@@ -374,7 +418,7 @@ const ThoiGianThucTeCell = ({ initialMinutes = 0, isRunning, onStop }) => {
     };
 
     return (
-        <td className='man-det-td' style={{ width: '10%' }}>
+        <td className='man-det-td' style={{ width: '10%' , fontSize: 20, color: 'red', fontWeight: 'bold'}}>
             {formatTime()}
         </td>
     );
@@ -676,29 +720,29 @@ const ConfirmDeleteModal = ({ setIsShowDeleteModal, workOrderDeleteId, setLenhSa
     );
 };
 
-const ReadyState = ({handleStart, maLenh}) => {
+const ReadyState = ({ handleStart, maLenh ,currentState}) => {
     return (
         <div>
-            <button onClick={() => handleStart(maLenh)} className='btn-action' style={{ backgroundColor: '#33CCCC' }}>Start</button>
+            <button onClick={() => handleStart(maLenh, "Inprogress", currentState)} className='btn-action' style={{ backgroundColor: '#33CCCC' }}>Start</button>
         </div>
     )
 }
 
-const InprogressState = ({handlePause, handleStop, maLenh}) => {
+const InprogressState = ({ handlePause, handleStop, maLenh, currentState }) => {
     return (
         <div>
-            <button onClick={() => handlePause(maLenh)} className='btn-action' style={{ backgroundColor: '#CCCC00', marginTop: 5 }}>Pause</button>
-            <button onClick={() => handleStop(maLenh)} className='btn-action' style={{ backgroundColor: '#CC3333', marginTop: 5 }}>Block</button>
-            <button onClick={() => handleStop(maLenh)} className='btn-action' style={{ backgroundColor: '#339900', marginTop: 5 }}>Done</button>
+            <button onClick={() => handlePause(maLenh, "Pause", currentState)} className='btn-action' style={{ backgroundColor: '#CCCC00', marginTop: 5 }}>Pause</button>
+            <button onClick={() => handleStop(maLenh, "Block", currentState)} className='btn-action' style={{ backgroundColor: '#CC3333', marginTop: 5 }}>Block</button>
+            <button onClick={() => handleStop(maLenh, "Done", currentState)} className='btn-action' style={{ backgroundColor: '#339900', marginTop: 5 }}>Done</button>
         </div>
     )
 }
 
-const PauseState = ({handleStart, handleStop, maLenh}) => {
+const PauseState = ({ handleStart, handleStop, maLenh, currentState  }) => {
     return (
         <div>
-            <button onClick={() => handleStart(maLenh)} className='btn-action' style={{ backgroundColor: '#FFCC33', marginTop: 5 }}>Continue</button>
-            <button onClick={() => handleStop(maLenh)} className='btn-action' style={{ backgroundColor: '#CC3333', marginTop: 5 }}>Block</button>
+            <button onClick={() => handleStart(maLenh, "Inprogress", currentState)} className='btn-action' style={{ backgroundColor: '#FFCC33', marginTop: 5 }}>Continue</button>
+            <button onClick={() => handleStop(maLenh,"Block", currentState)} className='btn-action' style={{ backgroundColor: '#CC3333', marginTop: 5 }}>Block</button>
         </div>
     )
 }
@@ -706,7 +750,7 @@ const PauseState = ({handleStart, handleStop, maLenh}) => {
 const BlockState = () => {
     return (
         <div>
-            <button className='btn-action' style={{ backgroundColor: '#009999', marginTop: 5 }}>Return</button>
+            <button className='btn-action' style={{ backgroundColor: '#888888', marginTop: 5 }}>Return</button>
         </div>
     )
 }
