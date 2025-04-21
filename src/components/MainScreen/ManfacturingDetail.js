@@ -100,7 +100,13 @@ const ManfacturingDetail = ({ userName }) => {
     }
 
     const clickBackManfacturingOrders = () => {
-        navigate('/manfacturingorders')
+        const hasInprogress = lenhSanXuat.some(item => item.trangThai === "Inprogress");
+
+        if (hasInprogress) {
+            notify_error("Hãy tạm dừng lệnh sản xuất trước khi rời màn hình này !")
+        } else {
+            navigate('/manfacturingorders')
+        }
     }
 
     const openModal = () => {
@@ -135,14 +141,14 @@ const ManfacturingDetail = ({ userName }) => {
 
     const [timers, setTimers] = useState({}); // Ví dụ: { 'maLenh001': 'running', 'maLenh002': 'paused' }
 
-    const callApiChangeStatus = async (maLenh, status , currentState) => {
+    const callApiChangeStatus = async (maLenh, status, currentState) => {
         var minutes
-        if(currentState === "Ready") {
+        if (currentState === "Ready") {
             minutes = 0
         } else {
             minutes = convertSecondsToDecimalMinutes(realTime)
         }
-         
+
         var makhint = parseLenhSx(maLenh)
         const requestBody = {
             maLenh: makhint,
@@ -157,24 +163,56 @@ const ManfacturingDetail = ({ userName }) => {
         }
     }
 
-    const handleStart = async (maLenh, trangthaithaydoi, trangthaihientai) => {
+    const callApiChanePlantStatus = async (makehoach, trangthai) => {
+        var requestBody = {
+            maKeHoach: makehoach,
+            trangThai: trangthai
+        }
+        try {
+            await axios.post('https://localhost:7135/api/KeHoachSanXuatx/update-status', requestBody)
+        }
+        catch (ex) {
+            console.error('Lỗi khi gọi API:', ex);
+        }
+    }
+
+    const handleStart = async (maLenh, trangthaithaydoi, trangthaihientai, thutu) => {
         setTimers(prev => ({ ...prev, [maLenh]: true }));
 
         await callApiChangeStatus(maLenh, trangthaithaydoi, trangthaihientai)
+
+
+
+        if (thutu === 1) {
+            var makh = Number(item.maKeHoach.substring(5, 10))
+            callApiChanePlantStatus(makh, "Inprogress")
+        }
+
         await callGetWorkOrderListByPlantCode()
     };
 
-    const handlePause = async (maLenh,trangthaithaydoi, trangthaihientai) => {
+    const handlePause = async (maLenh, trangthaithaydoi, trangthaihientai) => {
         setTimers(prev => ({ ...prev, [maLenh]: false }));
 
         await callApiChangeStatus(maLenh, trangthaithaydoi, trangthaihientai)
         await callGetWorkOrderListByPlantCode()
     };
 
-    const handleStop = async (maLenh, trangthaithaydoi, trangthaihientai) => {
+    const handleStop = async (maLenh, trangthaithaydoi, trangthaihientai, thutu) => {
         setTimers(prev => ({ ...prev, [maLenh]: 'stopped' }));
 
         await callApiChangeStatus(maLenh, trangthaithaydoi, trangthaihientai)
+
+        if (trangthaithaydoi === "Done" && lenhSanXuat.length === thutu) {
+            var makh = Number(item.maKeHoach.substring(5, 10))
+            callApiChanePlantStatus(makh, "Done")
+        }
+
+        if (trangthaithaydoi === "Block") {
+            var makh = Number(item.maKeHoach.substring(5, 10))
+            callApiChanePlantStatus(makh, "Block")
+        }
+
         await callGetWorkOrderListByPlantCode()
     };
 
@@ -320,38 +358,75 @@ const ManfacturingDetail = ({ userName }) => {
                                         />
                                     </td>
                                     <td className='man-det-td' style={{ color: '#18A2B8', fontWeight: 'bold' }}>{llv.nguoiChiuTrachNhiem}</td>
-                                    <td className='man-det-td' >
-                                        <div
-                                            className='man-det-td'
-                                            style={{
-                                                backgroundColor:
-                                                    llv.trangThai === "Ready"
-                                                        ? "#18A2B8"
-                                                        : llv.trangThai === "Inprogress"
-                                                            ? "#CCCC33"
-                                                            : llv.trangThai === "Block"
-                                                                ? "#BB0000"
-                                                                : llv.trangThai === "Done" ? "#339900"
-                                                                    : "#808000", // Màu mặc định nếu không khớp
-                                                color: "white", // Đổi màu chữ để dễ đọc hơn
-                                                fontWeight: "bold", // Làm nổi bật chữ
-                                                textAlign: "center", // Căn giữa nội dung
-                                                width: 50,
-                                                display: 'flex',
-                                                justifyContent: 'center',
-                                                alignItems: 'center',
-                                                width: 100
-                                            }}
-                                        >
-                                            {llv.trangThai}
-                                        </div>
+                                    <td className='man-det-td'>
+                                        {
+                                            (llv.thuTu > 1 &&
+                                                llv.dieuKienBatDauGiaiDoanTiepTheo === "Khi tất cả hoàn thành" &&
+                                                lenhSanXuat[index - 1]?.trangThai !== "Done")
+                                                ?
+                                                (
+                                                    <div
+                                                        className='man-det-td'
+                                                        style={{
+                                                            backgroundColor: '#00CCFF',
+                                                            color: "white",
+                                                            fontWeight: "bold",
+                                                            textAlign: "center",
+                                                            display: 'flex',
+                                                            justifyContent: 'center',
+                                                            alignItems: 'center',
+                                                            width: 120,
+                                                            borderRadius: 20
+                                                        }}
+                                                    >
+                                                        Watting Previous Step
+                                                    </div>
+                                                ) // hoặc <></>
+                                                :
+                                                (
+                                                    <div
+                                                        className='man-det-td'
+                                                        style={{
+                                                            backgroundColor:
+                                                                llv.trangThai === "Ready"
+                                                                    ? "#18A2B8"
+                                                                    : llv.trangThai === "Inprogress"
+                                                                        ? "#CCCC33"
+                                                                        : llv.trangThai === "Block"
+                                                                            ? "#BB0000"
+                                                                            : llv.trangThai === "Done"
+                                                                                ? "#339900"
+                                                                                : "#808000",
+                                                            color: "white",
+                                                            fontWeight: "bold",
+                                                            textAlign: "center",
+                                                            display: 'flex',
+                                                            justifyContent: 'center',
+                                                            alignItems: 'center',
+                                                            width: 100,
+                                                            borderRadius: 20
+                                                        }}
+                                                    >
+                                                        {llv.trangThai}
+                                                    </div>
+                                                )
+                                        }
                                     </td>
+
                                     <td className='man-det-td' >
                                         {
-                                            llv.trangThai === "Ready" ? <ReadyState handleStart={handleStart} maLenh={llv.maLenh} currentState={llv.trangThai}/> :
-                                                llv.trangThai === "Inprogress" ? <InprogressState handlePause={handlePause} handleStop={handleStop} maLenh={llv.maLenh} currentState={llv.trangThai}/> :
-                                                    llv.trangThai === "Pause" ? <PauseState handleStart={handleStart} handleStop={handleStop} maLenh={llv.maLenh} currentState={llv.trangThai}/> :
-                                                        llv.trangThai === "Block" ? <BlockState /> : <div></div>
+                                            (llv.thuTu > 1 &&
+                                                llv.dieuKienBatDauGiaiDoanTiepTheo === "Khi tất cả hoàn thành" &&
+                                                lenhSanXuat[index - 1]?.trangThai !== "Done")
+                                                ?
+                                                null
+                                                :
+                                                (
+                                                    llv.trangThai === "Ready" ? <ReadyState handleStart={handleStart} maLenh={llv.maLenh} currentState={llv.trangThai} thuTu={llv.thuTu} /> :
+                                                        llv.trangThai === "Inprogress" ? <InprogressState handlePause={handlePause} handleStop={handleStop} maLenh={llv.maLenh} currentState={llv.trangThai} thuTu={llv.thuTu} /> :
+                                                            llv.trangThai === "Pause" ? <PauseState handleStart={handleStart} handleStop={handleStop} maLenh={llv.maLenh} currentState={llv.trangThai} thuTu={llv.thuTu} /> :
+                                                                llv.trangThai === "Block" ? <BlockState /> : <div></div>
+                                                )
                                         }
                                     </td>
                                     <td className='man-det-td' >
@@ -378,6 +453,7 @@ const ManfacturingDetail = ({ userName }) => {
                     workOrderDeleteId={workOrderDeleteId} setLenhSanXuat={setLenhSanXuat} maKeHoach={item.maKeHoach}
                 />
             }
+            <ToastContainer theme="colored" />
         </div>
     )
 }
@@ -418,7 +494,7 @@ const ThoiGianThucTeCell = ({ initialMinutes = 0, isRunning, onStop, onTick }) =
     };
 
     return (
-        <td className='man-det-td' style={{ width: '10%' , fontSize: 20, color: 'red', fontWeight: 'bold'}}>
+        <td className='man-det-td' style={{ width: '10%', fontSize: 20, color: 'red', fontWeight: 'bold' }}>
             {formatTime()}
         </td>
     );
@@ -598,10 +674,6 @@ const AddWorkOrderModal = ({ setIsOpenModal, maKeHoach, maSanPham, userName, set
                     <label>Trạng Thái:
                         <select name="trangThai" value={formData.trangThai} onChange={handleChange}>
                             <option value="Ready">Ready</option>
-                            <option value="Inprogress">Inprogress</option>
-                            <option value="Pause">Pause</option>
-                            <option value="Block">Block</option>
-                            <option value="Done">Done</option>
                         </select>
                     </label>
 
@@ -720,29 +792,29 @@ const ConfirmDeleteModal = ({ setIsShowDeleteModal, workOrderDeleteId, setLenhSa
     );
 };
 
-const ReadyState = ({ handleStart, maLenh ,currentState}) => {
+const ReadyState = ({ handleStart, maLenh, currentState, thuTu }) => {
     return (
         <div>
-            <button onClick={() => handleStart(maLenh, "Inprogress", currentState)} className='btn-action' style={{ backgroundColor: '#33CCCC' }}>Start</button>
+            <button onClick={() => handleStart(maLenh, "Inprogress", currentState, thuTu)} className='btn-action' style={{ backgroundColor: '#33CCCC' }}>Start</button>
         </div>
     )
 }
 
-const InprogressState = ({ handlePause, handleStop, maLenh, currentState }) => {
+const InprogressState = ({ handlePause, handleStop, maLenh, currentState, thuTu }) => {
     return (
         <div>
             <button onClick={() => handlePause(maLenh, "Pause", currentState)} className='btn-action' style={{ backgroundColor: '#CCCC00', marginTop: 5 }}>Pause</button>
-            <button onClick={() => handleStop(maLenh, "Block", currentState)} className='btn-action' style={{ backgroundColor: '#CC3333', marginTop: 5 }}>Block</button>
-            <button onClick={() => handleStop(maLenh, "Done", currentState)} className='btn-action' style={{ backgroundColor: '#339900', marginTop: 5 }}>Done</button>
+            <button onClick={() => handleStop(maLenh, "Block", currentState, thuTu)} className='btn-action' style={{ backgroundColor: '#CC3333', marginTop: 5 }}>Block</button>
+            <button onClick={() => handleStop(maLenh, "Done", currentState, thuTu)} className='btn-action' style={{ backgroundColor: '#339900', marginTop: 5 }}>Done</button>
         </div>
     )
 }
 
-const PauseState = ({ handleStart, handleStop, maLenh, currentState  }) => {
+const PauseState = ({ handleStart, handleStop, maLenh, currentState, thuTu }) => {
     return (
         <div>
             <button onClick={() => handleStart(maLenh, "Inprogress", currentState)} className='btn-action' style={{ backgroundColor: '#FFCC33', marginTop: 5 }}>Continue</button>
-            <button onClick={() => handleStop(maLenh,"Block", currentState)} className='btn-action' style={{ backgroundColor: '#CC3333', marginTop: 5 }}>Block</button>
+            <button onClick={() => handleStop(maLenh, "Block", currentState, thuTu)} className='btn-action' style={{ backgroundColor: '#CC3333', marginTop: 5 }}>Block</button>
         </div>
     )
 }

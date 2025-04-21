@@ -121,9 +121,9 @@ const Workorders = () => {
                                                     ? "#18A2B8"
                                                     : item.trangThai === "Inprogress"
                                                         ? "#1FA9FD"
-                                                        : item.trangThai === "Fail"
+                                                        : item.trangThai === "Block"
                                                             ? "#EE0000"
-                                                            : "transparent", // Màu mặc định nếu không khớp
+                                                            : "#339900", 
                                             color: "white", // Đổi màu chữ để dễ đọc hơn
                                             fontWeight: "bold", // Làm nổi bật chữ
                                             textAlign: "center", // Căn giữa nội dung
