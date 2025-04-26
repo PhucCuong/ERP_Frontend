@@ -94,11 +94,6 @@ const ManfacturingDetail = ({ userName }) => {
             })
     }
 
-    // biến makehoach từ 4 thành 'KHSX/00004'
-    const formatMaKeHoach = (number) => {
-        return `KHSX/${number.toString().padStart(5, '0')}`;
-    }
-
     const clickBackManfacturingOrders = () => {
         const hasInprogress = lenhSanXuat.some(item => item.trangThai === "Inprogress");
 
@@ -198,6 +193,25 @@ const ManfacturingDetail = ({ userName }) => {
         await callGetWorkOrderListByPlantCode()
     };
 
+    const callApiNhapKho = async () => {
+        var requestBody = {
+            maKeHoach: item.maKeHoach,
+            maSanPham: item.maSanPham,
+            soLuongNhap: item.soLuong,
+            ngayNhap: new Date().toISOString().split('T')[0],
+            nguoiNhap: userName,
+            trangThai: "Watting",
+            moTa: "",
+            ngayTao: new Date().toISOString().split('T')[0],
+            ngayChinhSua: new Date().toISOString().split('T')[0]
+        };
+        try {
+            await axios.post('https://localhost:7135/api/NhapKhox/add-list', requestBody)
+        } catch (ex) {
+            console.error('Lỗi khi gọi API:', ex);
+        }
+    }
+
     const handleStop = async (maLenh, trangthaithaydoi, trangthaihientai, thutu) => {
         setTimers(prev => ({ ...prev, [maLenh]: 'stopped' }));
 
@@ -206,6 +220,10 @@ const ManfacturingDetail = ({ userName }) => {
         if (trangthaithaydoi === "Done" && lenhSanXuat.length === thutu) {
             var makh = Number(item.maKeHoach.substring(5, 10))
             callApiChanePlantStatus(makh, "Done")
+
+            if (thutu === lenhSanXuat.length) {
+                await callApiNhapKho()
+            }
         }
 
         if (trangthaithaydoi === "Block") {
@@ -218,15 +236,13 @@ const ManfacturingDetail = ({ userName }) => {
 
     const handleStoppedTime = (maLenh, totalSeconds) => {
         const minutes = Math.floor(totalSeconds / 60);
-        console.log(`⏱ [${maLenh}] Thời gian thực tế: ${minutes} phút`);
-
         // Gửi API cập nhật nếu cần
     };
 
     return (
         <div>
             <div className="header">
-            Xem lệnh sản xuất</div>
+                Xem lệnh sản xuất</div>
             <button className='manfacturing-detail-close-button' onClick={() => clickBackManfacturingOrders()}>
                 <IoMdClose className='manfacturing-detail-close-icon' />
             </button>
@@ -431,11 +447,19 @@ const ManfacturingDetail = ({ userName }) => {
                                         }
                                     </td>
                                     <td className='man-det-td' >
-                                        <button className='md-delete-btn' onClick={() => deleteWorkOrder(llv.maLenh)}
-                                            style={{
-                                                backgroundColor: (index % 2 !== 0) ? '#ffffff' : '#F0F0F0'
-                                            }}
-                                        ><FaRegTrashAlt /></button>
+                                        {
+                                            llv.trangThai === "Ready"
+                                                ?
+                                                <div>
+                                                    <button className='md-delete-btn' onClick={() => deleteWorkOrder(llv.maLenh)}
+                                                        style={{
+                                                            backgroundColor: (index % 2 !== 0) ? '#ffffff' : '#F0F0F0'
+                                                        }}
+                                                    ><FaRegTrashAlt /></button>
+                                                </div>
+                                                :
+                                                null
+                                        }
                                     </td>
                                 </tr>
                             )
@@ -585,59 +609,64 @@ const AddWorkOrderModal = ({ setIsOpenModal, maKeHoach, maSanPham, userName, set
         }));
     };
 
-        const handleSubmit = async () => {
-            setLoading(true);
-        
-            const formSubmit = {
-                maKeHoach: parseInt(maKeHoach.split('/')[1]),
-                maSanPham: maSanPham,
-                maQuyTrinh: formData.maQuyTrinh,
-                soLuong: parseInt(formData.soLuong),
-                ngayBatDau: formData.ngayBatDau,
-                ngayKetThuc: formData.ngayKetThuc || null,
-                trangThai: formData.trangThai,
-                nguoiChiuTrachNhiem: userName,
-                khuVucSanXuat: formData.khuVucSanXuat,
-            };
-            console.log("Payload gửi đi:", JSON.stringify(formSubmit, null, 2));        
-        
-            console.log("Dữ liệu gửi backend:", formSubmit);
-        
-            try {
-                const res = await axios.post('https://localhost:7135/api/LenhSanXuatx/add-list-workorder', formSubmit);
-                notify_success("Thêm các lệnh sản xuất thành công!");
-                setLoading(false);
-        
-                const result = await axios.get(`https://localhost:7135/api/LenhSanXuatx/get-workorder-list-by-plant-code/${Number(maKeHoach.substring(5, 10))}`);
-                setLenhSanXuat(result.data);
-                
-                setTimeout(() => {
-                    setIsOpenModal(false);
-                }, 500);
-            } catch (err) {
-                setLoading(false);
-                console.error("Chi tiết lỗi:", err);
-                let errorMsg = 'Có lỗi xảy ra khi gửi yêu cầu!';
-        
-                if (err.response) {
-                    errorMsg += ` Server trả về mã lỗi ${err.response.status}`;
-                    if (typeof err.response.data === 'string') {
-                        errorMsg += ` - ${err.response.data}`;
-                    } else if (err.response.data.message) {
-                        errorMsg += ` - ${err.response.data.message}`;
-                    } else {
-                        errorMsg += ` - ${JSON.stringify(err.response.data)}`;
-                    }
-                } else if (err.request) {
-                    errorMsg += " Không nhận được phản hồi từ server.";
-                } else {
-                    errorMsg += ` ${err.message}`;
-                }
-        
-                notify_error(errorMsg);
-            }
+    const handleSubmit = async () => {
+        setLoading(true);
+
+        const formSubmit = {
+            maKeHoach: parseInt(maKeHoach.split('/')[1]),
+            maSanPham: maSanPham,
+            maQuyTrinh: formData.maQuyTrinh,
+            soLuong: parseInt(formData.soLuong),
+            ngayBatDau: formData.ngayBatDau,
+            ngayKetThuc: formData.ngayKetThuc || null,
+            trangThai: formData.trangThai,
+            nguoiChiuTrachNhiem: userName,
+            khuVucSanXuat: formData.khuVucSanXuat,
         };
-    
+        console.log("Payload gửi đi:", JSON.stringify(formSubmit, null, 2));
+
+        console.log("Dữ liệu gửi backend:", formSubmit);
+
+        try {
+            const res = await axios.post('https://localhost:7135/api/LenhSanXuatx/add-list-workorder', formSubmit);
+            notify_success("Thêm các lệnh sản xuất thành công!");
+            setLoading(false);
+
+            const result = await axios.get(`https://localhost:7135/api/LenhSanXuatx/get-workorder-list-by-plant-code/${Number(maKeHoach.substring(5, 10))}`);
+            setLenhSanXuat(result.data);
+
+            setTimeout(() => {
+                setIsOpenModal(false);
+            }, 500);
+        } catch (err) {
+            setLoading(false);
+            console.error("Chi tiết lỗi:", err);
+
+            let errorMsg = 'Có lỗi xảy ra khi gửi yêu cầu!';
+
+            if (err.response) {
+                let responseData = err.response.data;
+
+                if (typeof responseData === 'string') {
+                    // Nếu server trả về string, chỉ lấy dòng đầu tiên
+                    errorMsg = responseData.split('\n')[0].trim();
+                    // Nếu muốn đẹp hơn nữa, bỏ prefix "System.Exception:" nếu có
+                    errorMsg = errorMsg.replace(/^System\.Exception:\s*/, '');
+                } else if (responseData.message) {
+                    errorMsg = responseData.message;
+                } else {
+                    errorMsg = JSON.stringify(responseData);
+                }
+            } else if (err.request) {
+                errorMsg = 'Không nhận được phản hồi từ server.';
+            } else {
+                errorMsg = err.message;
+            }
+
+            notify_error(errorMsg);
+        }
+    };
+
     return (
         <div className="modal-overlay">
             <div className="modal-content">
@@ -650,7 +679,7 @@ const AddWorkOrderModal = ({ setIsOpenModal, maKeHoach, maSanPham, userName, set
                     </label>
 
                     <label>Sản Phẩm:
-                    <select name="maSanPham" value={formData.productName} onChange={handleChange}>
+                        <select name="maSanPham" value={formData.productName} onChange={handleChange}>
                             <option value="productName">{productName}</option>
                         </select><br />
                     </label>
@@ -740,7 +769,7 @@ const ConfirmDeleteModal = ({ setIsShowDeleteModal, workOrderDeleteId, setLenhSa
             // gọi lại API để lấy work order mới nhất
             const result = await axios.get(`https://localhost:7135/api/LenhSanXuatx/get-workorder-list-by-plant-code/${Number(maKeHoach.substring(5, 10))}`);
             setLenhSanXuat(result.data);
-            } catch (err) {
+        } catch (err) {
             setLoading(false);
 
             // In toàn bộ thông tin lỗi ra console
