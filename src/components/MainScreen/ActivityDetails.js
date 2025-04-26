@@ -440,6 +440,7 @@ const ActivityDetails = ({ onSave, onCancel }) => {
                             </>
                         ) : "Lưu"}
                     </button>
+                    
                     <button
                         type="button"
                         onClick={handleCancel}

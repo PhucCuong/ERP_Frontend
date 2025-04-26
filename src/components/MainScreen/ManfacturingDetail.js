@@ -225,33 +225,34 @@ const ManfacturingDetail = ({ userName }) => {
 
     return (
         <div>
-            <div className="header">View Manfacturing Order</div>
+            <div className="header">
+            Xem lệnh sản xuất</div>
             <button className='manfacturing-detail-close-button' onClick={() => clickBackManfacturingOrders()}>
                 <IoMdClose className='manfacturing-detail-close-icon' />
             </button>
             <div className='manfacturing-detail-info'>
                 <div className='manfacturing-detail-column'>
                     <div className='man-det-info-row'>
-                        <div className='bold'>Product :</div>
+                        <div className='bold'>Sản phẩm :</div>
                         <div className='man-det-info-value primary-color'>{item.tenSanPham}</div>
                     </div>
                     <div className='man-det-info-row'>
-                        <div className='bold'>Quantity :</div>
+                        <div className='bold'>Số lượng :</div>
                         <div className='man-det-info-value primary-color'>{item.soLuong}</div>
                     </div>
                 </div>
 
                 <div className='manfacturing-detail-column'>
                     <div className='man-det-info-row'>
-                        <div className='bold'>Start Date :</div>
+                        <div className='bold'>Ngày bắt đầu :</div>
                         <div className='man-det-info-value green-color'>{item.ngayTao.slice(0, 10)}</div>
                     </div>
                     <div className='man-det-info-row'>
-                        <div className='bold'>Responsible :</div>
+                        <div className='bold'>Người chịu trách nhiệm :</div>
                         <div className='man-det-info-value primary-color'>{item.nguoiTao}</div>
                     </div>
                     <div className='man-det-info-row'>
-                        <div className='bold'>Status :</div>
+                        <div className='bold'>Trạng thái :</div>
                         <div className='man-det-info-value'
                             style={{
                                 color:
@@ -584,52 +585,59 @@ const AddWorkOrderModal = ({ setIsOpenModal, maKeHoach, maSanPham, userName, set
         }));
     };
 
-    const handleSubmit = async () => {
-        setLoading(true);
-        const formSunmit = {
-            ...formData,
-            maKeHoach: parseInt(maKeHoach.split('/')[1]),
-            maSanPham,
-            nguoiChiuTrachNhiem: userName
-        };
-
-        console.log(formSunmit)
-
-        try {
-            const res = await axios.post('https://localhost:7135/api/LenhSanXuatx/add-list-workorder', formSunmit);
-            notify_success("Thêm các lệnh sản xuất thành công!");
-            setLoading(false);
-
-            const result = await axios.get(`https://localhost:7135/api/LenhSanXuatx/get-workorder-list-by-plant-code/${Number(maKeHoach.substring(5, 10))}`);
-            setLenhSanXuat(result.data);
-
-            setTimeout(() => {
-                setIsOpenModal(false);
-            }, 500);
-        } catch (err) {
-            setLoading(false);
-            console.error("Chi tiết lỗi:", err);
-            let errorMsg = 'Có lỗi xảy ra khi gửi yêu cầu!';
-
-            if (err.response) {
-                errorMsg += ` Server trả về mã lỗi ${err.response.status}`;
-                if (typeof err.response.data === 'string') {
-                    errorMsg += ` - ${err.response.data}`;
-                } else if (err.response.data.message) {
-                    errorMsg += ` - ${err.response.data.message}`;
+        const handleSubmit = async () => {
+            setLoading(true);
+        
+            const formSubmit = {
+                maKeHoach: parseInt(maKeHoach.split('/')[1]),
+                maSanPham: maSanPham,
+                maQuyTrinh: formData.maQuyTrinh,
+                soLuong: parseInt(formData.soLuong),
+                ngayBatDau: formData.ngayBatDau,
+                ngayKetThuc: formData.ngayKetThuc || null,
+                trangThai: formData.trangThai,
+                nguoiChiuTrachNhiem: userName,
+                khuVucSanXuat: formData.khuVucSanXuat,
+            };
+            console.log("Payload gửi đi:", JSON.stringify(formSubmit, null, 2));        
+        
+            console.log("Dữ liệu gửi backend:", formSubmit);
+        
+            try {
+                const res = await axios.post('https://localhost:7135/api/LenhSanXuatx/add-list-workorder', formSubmit);
+                notify_success("Thêm các lệnh sản xuất thành công!");
+                setLoading(false);
+        
+                const result = await axios.get(`https://localhost:7135/api/LenhSanXuatx/get-workorder-list-by-plant-code/${Number(maKeHoach.substring(5, 10))}`);
+                setLenhSanXuat(result.data);
+                
+                setTimeout(() => {
+                    setIsOpenModal(false);
+                }, 500);
+            } catch (err) {
+                setLoading(false);
+                console.error("Chi tiết lỗi:", err);
+                let errorMsg = 'Có lỗi xảy ra khi gửi yêu cầu!';
+        
+                if (err.response) {
+                    errorMsg += ` Server trả về mã lỗi ${err.response.status}`;
+                    if (typeof err.response.data === 'string') {
+                        errorMsg += ` - ${err.response.data}`;
+                    } else if (err.response.data.message) {
+                        errorMsg += ` - ${err.response.data.message}`;
+                    } else {
+                        errorMsg += ` - ${JSON.stringify(err.response.data)}`;
+                    }
+                } else if (err.request) {
+                    errorMsg += " Không nhận được phản hồi từ server.";
                 } else {
-                    errorMsg += ` - ${JSON.stringify(err.response.data)}`;
+                    errorMsg += ` ${err.message}`;
                 }
-            } else if (err.request) {
-                errorMsg += " Không nhận được phản hồi từ server.";
-            } else {
-                errorMsg += ` ${err.message}`;
+        
+                notify_error(errorMsg);
             }
-
-            notify_error(errorMsg);
-        }
-    };
-
+        };
+    
     return (
         <div className="modal-overlay">
             <div className="modal-content">
@@ -642,7 +650,7 @@ const AddWorkOrderModal = ({ setIsOpenModal, maKeHoach, maSanPham, userName, set
                     </label>
 
                     <label>Sản Phẩm:
-                        <select name="maSanPham" value={formData.productName}>
+                    <select name="maSanPham" value={formData.productName} onChange={handleChange}>
                             <option value="productName">{productName}</option>
                         </select><br />
                     </label>
@@ -732,7 +740,7 @@ const ConfirmDeleteModal = ({ setIsShowDeleteModal, workOrderDeleteId, setLenhSa
             // gọi lại API để lấy work order mới nhất
             const result = await axios.get(`https://localhost:7135/api/LenhSanXuatx/get-workorder-list-by-plant-code/${Number(maKeHoach.substring(5, 10))}`);
             setLenhSanXuat(result.data);
-        } catch (err) {
+            } catch (err) {
             setLoading(false);
 
             // In toàn bộ thông tin lỗi ra console

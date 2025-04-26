@@ -114,9 +114,9 @@ const Menu = ({ setUserName }) => {
                             renderNavLink('/raw-materials', 'Nguyên vật liệu', <AiOutlineDeploymentUnit />, 'raw-materials')}
                         {allowedRoles.product.includes(user.role) &&
                             renderNavLink('/products', 'Sản phẩm', <MdProductionQuantityLimits />, 'products')}
-                                {allowedRoles.workCenter.includes(user.role) &&
+                        {allowedRoles.workCenter.includes(user.role) &&
                             renderNavLink('/workcenters', 'Nhà máy', <RiBuilding2Fill />, 'workcenters')}
-                            {allowedRoles.workCenter.includes(user.role) &&
+                        {allowedRoles.workCenter.includes(user.role) &&
                             renderNavLink('/NhaCungCap', 'Nhà cung cấp', <RiBuilding2Fill />, 'NhaCungCap')}
                     </div>
                 )}
@@ -151,13 +151,15 @@ const Menu = ({ setUserName }) => {
                             renderNavLink('/manfacturingorders', 'Kế hoạch sản xuất', <GrPlan />, 'manfacturingorders')}
                         {allowedRoles.workOrder.includes(user.role) &&
                             renderNavLink('/workorders', 'Lệnh sản xuất', <GrUserWorker />, 'workorders')}
-                        {allowedRoles.unbuild.includes(user.role) &&
-                            renderNavLink('/unbuildorders', 'Hủy lệnh sản xuất', <MdInsertPageBreak />, 'unbuildorders')}
+
                         {allowedRoles.scrap.includes(user.role) &&
-                            renderNavLink('/scrap', 'Lệnh gỡ bỏ', <IoTrashBinOutline />, 'scrap')}
+                            renderNavLink('/quality', 'Kiểm tra chất lượng', <IoTrashBinOutline />, 'quality')}
+
+                        {allowedRoles.unbuild.includes(user.role) &&
+                            renderNavLink('/unbuildorders', 'Lệnh gỡ bỏ', <MdInsertPageBreak />, 'unbuildorders')}
                         {allowedRoles.process.includes(user.role) &&
                             renderNavLink('/productionprocess', 'Quy trình sản xuất', <AiOutlineRetweet />, 'productionprocess')}
-                    
+
                         {allowedRoles.report.includes(user.role) &&
                             renderNavLink('/reportings', 'Báo cáo sản xuất', <BsReception4 />, 'reportings')}
                     </div>

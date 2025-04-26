@@ -1,6 +1,6 @@
 import Spinner from 'react-bootstrap/Spinner';
 import { useState, useEffect } from 'react';
-const Scrap = () => {
+const Quality = () => {
     const [loading, setLoading] = useState(false);
     useEffect(() => {
         setLoading(true)
@@ -10,7 +10,7 @@ const Scrap = () => {
     }, [])
     return (
         <div>
-            this is scrap
+            <h2>Kiểm tra chất lượng</h2>
             {loading && <Loading />} {/* Hiển thị Loading khi đang xử lý */}
         </div>
     )
@@ -37,4 +37,4 @@ function Loading() {
     );
 }
 
-export default Scrap
+export default Quality
