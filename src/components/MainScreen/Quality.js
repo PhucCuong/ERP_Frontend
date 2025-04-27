@@ -1,6 +1,7 @@
 import Spinner from 'react-bootstrap/Spinner';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
 const Quality = () => {
     const [loading, setLoading] = useState(false);
     const [products, setProducts] = useState([]);
@@ -40,6 +41,20 @@ const Quality = () => {
         }
     };
 
+    const handleUpdateStatus = async (soseri, trangthai) => {
+        var requestBody = {
+            soseri: soseri,
+            trangThai: trangthai
+        }
+        try {
+            await axios.post('https://localhost:7135/api/NhapKhox/update-status', requestBody)
+            notify_success('Đánh giá sản phẩm thành công')
+        } catch (ex) {
+            notify_error('Đánh giá sản phẩm thất bại : ', ex.message)
+        }
+        callApiGetSanPhamTrongKho()
+    }
+
     return (
         <div style={{ padding: "20px" }}>
             <h2>Kiểm tra chất lượng</h2>
@@ -67,6 +82,7 @@ const Quality = () => {
                         <th>Tên Sản Phẩm</th>
                         <th>Ngày Nhập</th>
                         <th>Người Nhập</th>
+                        <th>Trạng thái</th>
                         <th>Đánh giá</th>
                     </tr>
                 </thead>
@@ -78,30 +94,52 @@ const Quality = () => {
                                 <td>{item.tenSanPham}</td>
                                 <td>{new Date(item.ngayNhap).toLocaleString()}</td>
                                 <td>{item.nguoiNhap}</td>
+                                <td
+                                    style={{
+                                        color: item.trangThai === "Watting"
+                                            ?
+                                            "#FF00FF"
+                                            : item.trangThai === "Passed" ? "#009900"
+                                                : "#FF3300"
+
+                                    }}
+                                >{item.trangThai}</td>
                                 <td>
-                                    <button style={{
-                                        padding: "6px 12px",
-                                        marginRight: "8px",
-                                        backgroundColor: "#4CAF50",
-                                        color: "white",
-                                        border: "none",
-                                        borderRadius: "6px",
-                                        cursor: "pointer",
-                                        fontWeight: "bold"
-                                    }}>
-                                        Đạt
-                                    </button>
-                                    <button style={{
-                                        padding: "6px 12px",
-                                        backgroundColor: "#f44336",
-                                        color: "white",
-                                        border: "none",
-                                        borderRadius: "6px",
-                                        cursor: "pointer",
-                                        fontWeight: "bold"
-                                    }}>
-                                        Không đạt
-                                    </button>
+                                    {
+                                        item.trangThai === "Watting"
+                                            ?
+                                            <div>
+                                                <button style={{
+                                                    padding: "6px 12px",
+                                                    marginRight: "8px",
+                                                    backgroundColor: "#4CAF50",
+                                                    color: "white",
+                                                    border: "none",
+                                                    borderRadius: "6px",
+                                                    cursor: "pointer",
+                                                    fontWeight: "bold"
+                                                }}
+                                                    onClick={() => handleUpdateStatus(item.soseri, 'Passed')}
+                                                >
+                                                    Đạt
+                                                </button>
+                                                <button style={{
+                                                    padding: "6px 12px",
+                                                    backgroundColor: "#f44336",
+                                                    color: "white",
+                                                    border: "none",
+                                                    borderRadius: "6px",
+                                                    cursor: "pointer",
+                                                    fontWeight: "bold"
+                                                }}
+                                                    onClick={() => handleUpdateStatus(item.soseri, 'Failed')}
+                                                >
+                                                    Không đạt
+                                                </button>
+                                            </div>
+                                            :
+                                            null
+                                    }
                                 </td>
                             </tr>
                         ))
@@ -114,6 +152,7 @@ const Quality = () => {
             </table>
 
             {loading && <Loading />}
+            <ToastContainer theme="colored" />
         </div>
     );
 };
@@ -138,5 +177,8 @@ function Loading() {
         </div>
     );
 }
+
+const notify_success = (message) => toast.info(message, { type: "success" });
+const notify_error = (message) => toast.info(message, { type: "error" });
 
 export default Quality

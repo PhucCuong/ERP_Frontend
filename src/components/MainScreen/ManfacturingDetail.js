@@ -193,11 +193,12 @@ const ManfacturingDetail = ({ userName }) => {
         await callGetWorkOrderListByPlantCode()
     };
 
-    const callApiNhapKho = async () => {
+    const callApiNhapKho = async (soluong) => {
+        console.log(item.soLuong)
         var requestBody = {
             maKeHoach: item.maKeHoach,
             maSanPham: item.maSanPham,
-            soLuongNhap: item.soLuong,
+            soLuongNhap: soluong,
             ngayNhap: new Date().toISOString().split('T')[0],
             nguoiNhap: userName,
             trangThai: "Watting",
@@ -212,7 +213,7 @@ const ManfacturingDetail = ({ userName }) => {
         }
     }
 
-    const handleStop = async (maLenh, trangthaithaydoi, trangthaihientai, thutu) => {
+    const handleStop = async (maLenh, trangthaithaydoi, trangthaihientai, thutu , soluongnhapkho) => {
         setTimers(prev => ({ ...prev, [maLenh]: 'stopped' }));
 
         await callApiChangeStatus(maLenh, trangthaithaydoi, trangthaihientai)
@@ -222,7 +223,7 @@ const ManfacturingDetail = ({ userName }) => {
             callApiChanePlantStatus(makh, "Done")
 
             if (thutu === lenhSanXuat.length) {
-                await callApiNhapKho()
+                await callApiNhapKho(soluongnhapkho)
             }
         }
 
@@ -440,7 +441,7 @@ const ManfacturingDetail = ({ userName }) => {
                                                 :
                                                 (
                                                     llv.trangThai === "Ready" ? <ReadyState handleStart={handleStart} maLenh={llv.maLenh} currentState={llv.trangThai} thuTu={llv.thuTu} /> :
-                                                        llv.trangThai === "Inprogress" ? <InprogressState handlePause={handlePause} handleStop={handleStop} maLenh={llv.maLenh} currentState={llv.trangThai} thuTu={llv.thuTu} /> :
+                                                        llv.trangThai === "Inprogress" ? <InprogressState handlePause={handlePause} handleStop={handleStop} maLenh={llv.maLenh} currentState={llv.trangThai} thuTu={llv.thuTu} soluongnhapkho={llv.soLuong}/> :
                                                             llv.trangThai === "Pause" ? <PauseState handleStart={handleStart} handleStop={handleStop} maLenh={llv.maLenh} currentState={llv.trangThai} thuTu={llv.thuTu} /> :
                                                                 llv.trangThai === "Block" ? <BlockState /> : <div></div>
                                                 )
@@ -837,12 +838,12 @@ const ReadyState = ({ handleStart, maLenh, currentState, thuTu }) => {
     )
 }
 
-const InprogressState = ({ handlePause, handleStop, maLenh, currentState, thuTu }) => {
+const InprogressState = ({ handlePause, handleStop, maLenh, currentState, thuTu , soluongnhapkho}) => {
     return (
         <div>
             <button onClick={() => handlePause(maLenh, "Pause", currentState)} className='btn-action' style={{ backgroundColor: '#CCCC00', marginTop: 5 }}>Pause</button>
-            <button onClick={() => handleStop(maLenh, "Block", currentState, thuTu)} className='btn-action' style={{ backgroundColor: '#CC3333', marginTop: 5 }}>Block</button>
-            <button onClick={() => handleStop(maLenh, "Done", currentState, thuTu)} className='btn-action' style={{ backgroundColor: '#339900', marginTop: 5 }}>Done</button>
+            <button onClick={() => handleStop(maLenh, "Block", currentState, thuTu, soluongnhapkho)} className='btn-action' style={{ backgroundColor: '#CC3333', marginTop: 5 }}>Block</button>
+            <button onClick={() => handleStop(maLenh, "Done", currentState, thuTu, soluongnhapkho)} className='btn-action' style={{ backgroundColor: '#339900', marginTop: 5 }}>Done</button>
         </div>
     )
 }
