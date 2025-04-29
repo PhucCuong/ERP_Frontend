@@ -13,12 +13,13 @@ import Reportings from "./Reportings";
 import CreateProduct from "./CreateProduct";
 import ManfacturingDetail from "./ManfacturingDetail";
 import RawMaterials from "./RawMaterials";
-import AddProcessForm from "./AddProcessForm"; // Thêm Import
-//import ActivityDetails from "./ActivityDetails";
+import AddProcessForm from "./AddProcessForm";
 import ActivityList from "./ActivityList";
 import AddPlant from "./AddPlant"
 import TonKho from "./tonkho";
-import AddNhaCungCap from "./NhaCungCap"
+import AddNhaCungCap from "./NhaCungCap";
+import ActivityDetails from "./ActivityDetails";
+import GiaoHang from "./GiaoHang";
 const MainScreen = ({userName}) => {
     return (
         <div className="mainscreen_container">
@@ -31,7 +32,7 @@ const MainScreen = ({userName}) => {
                 <Route path="/manfacturingorders" element={<Manfacturingorders/>} />
                 <Route path="/workorders" element={<Workorders />} />
                 <Route path="/unbuildorders" element={<Unbuildorders />} />
-                <Route path="/quality" element={<Quality />} />
+                <Route path="/quality" element={<Quality userName={userName}/>} />
                 <Route path="/productionprocess" element={<Productionprocess />} />
                 <Route path="/workcenters" element={<Workcenters />} />
                 <Route path="/reportings" element={<Reportings />} />
@@ -42,6 +43,10 @@ const MainScreen = ({userName}) => {
                 <Route path="/add-process" element={<AddProcessForm />} />
                 <Route path="/manfacturingorders/create" element={<AddPlant userName={userName}/>} />
                 <Route path="/NhaCungCap" element={<AddNhaCungCap />} />
+                <Route path="/add-activity" element={<ActivityDetails />} />
+                
+                <Route path="/GiaoHang" element={<GiaoHang />} />
+
             </Routes>
         </div>
     );

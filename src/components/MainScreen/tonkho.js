@@ -77,33 +77,38 @@ const TonKho = () => {
                   material.tenNguyenVatLieu.toLowerCase().includes(search.toLowerCase())
                 )
                 .map((material) => (
-                  <tr key={material.id}>
-                    <td>{material.tenNguyenVatLieu}</td>
-                    <td>{material.tonKhoHienCo}</td>
-                    <td>{material.tonKhoToiThieu}</td>
-                    <td>{material.tonKhoToiDa}</td>
-                    <td>{material.donViTinh}</td>
-                    <td>
-                      {material.tonKhoHienCo < material.tonKhoToiThieu ? (
-                        <span style={{ color: "red" }}>Cần đặt hàng</span>
-                      ) : (
-                        <span style={{ color: "green" }}>Đủ</span>
-                      )}
-                    </td>
-                    <td>
-                      {material.tonKhoHienCo < material.tonKhoToiThieu && (
+                  <React.Fragment key={material.id}>
+                    <tr>
+                      <td>{material.tenNguyenVatLieu}</td>
+                      <td>{material.tonKhoHienCo}</td>
+                      <td>{material.tonKhoToiThieu}</td>
+                      <td>{material.tonKhoToiDa}</td>
+                      <td>{material.donViTinh}</td>
+                      <td>
+                        {material.tonKhoHienCo < material.tonKhoToiThieu ? (
+                          <span style={{ color: "red", fontWeight: "bold" }}>!Cần đặt hàng</span>
+                        ) : material.tonKhoHienCo > material.tonKhoToiDa ? (
+                          <span style={{ color: "#ff9900", fontWeight: "bold" }}>⚠️Vượt tồn kho tối đa</span>
+                        ) : (
+                          <span style={{ color: "green", fontWeight: "bold" }}> Đủ</span>
+                        )}
+                      </td>
+                      <td>
                         <button
                           onClick={() => handleBoSungClick(material)}
                           className="bo-sung-link"
                         >
                           ➕ Bổ sung hàng
                         </button>
-                      )}
-                    </td>
-                  </tr>
+                      </td>
+                    </tr>
+
+                   
+                  </React.Fragment>
                 ))
             )}
           </tbody>
+
         </table>
       </div>
 

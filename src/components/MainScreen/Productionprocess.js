@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 const Productionprocess = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
-    const [processes, setProcesses] = useState([]);
+    const [processes, setProcesses] = useState([]); 
     const [hoveredRowIndex, setHoveredRowIndex] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
 
@@ -31,11 +31,11 @@ const Productionprocess = () => {
     };
 
     const handleEditClick = (maQuyTrinh, tenQuyTrinh) => {
-        navigate(`/activities/${maQuyTrinh}`, { 
-            state: { 
+        navigate(`/activities/${maQuyTrinh}`, {
+            state: {
                 maQuyTrinh: maQuyTrinh,
                 tenQuyTrinh: tenQuyTrinh  // Thêm tenQuyTrinh vào state
-            } 
+            }
         });
     };
 
@@ -52,8 +52,7 @@ const Productionprocess = () => {
 
     const handleSearch = (event) => {
         setSearchQuery(event.target.value);
-    };
-
+    };  
     const filteredProcesses = processes.filter(process =>
         process.tenQuyTrinh.toLowerCase().includes(searchQuery.toLowerCase()) ||
         process.maQuyTrinh.toLowerCase().includes(searchQuery.toLowerCase())  // Thêm điều kiện lọc cho mã quy trình
@@ -61,14 +60,21 @@ const Productionprocess = () => {
 
     return (
         <div>
-            <div className="product-header">Production Process</div>
+            <div className="product-header">QUY TRÌNH SẢN XUẤT</div>
             <div className="manfactring-button-row">
                 <button
                     className='production-process-new-button'
                     onClick={() => navigate("/add-process")}
                 >
-                    New
+                    + Thêm quy trình
                 </button>
+                <div className="floating-new-activity-button">
+                    <button
+                        onClick={() => navigate("/add-activity")}
+                    >
+                        + Thêm hoạt động
+                    </button>
+                </div>
                 <input
                     className="manfacturing-filter-input"
                     placeholder="Search..."
@@ -84,13 +90,13 @@ const Productionprocess = () => {
                     <tr className="manfacturing-table-title">
                         <th>Mã Quy Trình</th>
                         <th>Tên Quy Trình</th>
-                        <th>Actions</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
                     {filteredProcesses.length === 0 ? (
                         <tr>
-                            <td colSpan="3" style={{ textAlign: 'center' }}>No processes found</td>
+                            <td colSpan="3" style={{ textAlign: 'center' }}>Không có quy trình nào</td>
                         </tr>
                     ) : (
                         filteredProcesses.map((item, index) => (

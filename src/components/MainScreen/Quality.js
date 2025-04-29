@@ -2,7 +2,7 @@ import Spinner from 'react-bootstrap/Spinner';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
-const Quality = () => {
+const Quality = ({ userName }) => {
     const [loading, setLoading] = useState(false);
     const [products, setProducts] = useState([]);
     const [allProducts, setAllProducts] = useState([]); // lưu tất cả sản phẩm từ api
@@ -41,7 +41,30 @@ const Quality = () => {
         }
     };
 
-    const handleUpdateStatus = async (soseri, trangthai) => {
+    const callApiThemLenhGoBo = async (masanpham, soseri) => {
+
+        const middlePart = soseri.slice(5, -5);
+
+        // Convert thành số nguyên
+        const makh = parseInt(middlePart, 10);
+
+        var requestBody = {
+            maKeHoach: makh,
+            maSanPham: masanpham,
+            lyDoGoBo: "Không đạt chất lượng",
+            trangThai: "Watting",
+            nguoiChiuTrachNhiem: userName
+        }
+        try {
+            await axios.post('https://localhost:7135/api/LenhGoBox', requestBody)
+            notify_success('Thêm lệnh gỡ bỏ Thành công!')
+        } catch (ex) {
+            notify_error('Thêm lệnh gỡ bỏ thất bại : ', ex.message)
+        }
+    }
+
+    const handleUpdateStatus = async (soseri, trangthai, masanpham) => {
+
         var requestBody = {
             soseri: soseri,
             trangThai: trangthai
@@ -51,6 +74,10 @@ const Quality = () => {
             notify_success('Đánh giá sản phẩm thành công')
         } catch (ex) {
             notify_error('Đánh giá sản phẩm thất bại : ', ex.message)
+        }
+
+        if (trangthai === "Failed") {
+            callApiThemLenhGoBo(masanpham, soseri)
         }
         callApiGetSanPhamTrongKho()
     }
@@ -119,7 +146,7 @@ const Quality = () => {
                                                     cursor: "pointer",
                                                     fontWeight: "bold"
                                                 }}
-                                                    onClick={() => handleUpdateStatus(item.soseri, 'Passed')}
+                                                    onClick={() => handleUpdateStatus(item.soseri, 'Passed', item.maSanPham)}
                                                 >
                                                     Đạt
                                                 </button>
@@ -132,7 +159,7 @@ const Quality = () => {
                                                     cursor: "pointer",
                                                     fontWeight: "bold"
                                                 }}
-                                                    onClick={() => handleUpdateStatus(item.soseri, 'Failed')}
+                                                    onClick={() => handleUpdateStatus(item.soseri, 'Failed', item.maSanPham)}
                                                 >
                                                     Không đạt
                                                 </button>

@@ -6,6 +6,7 @@
     max-width: 1000px;
     margin: 0 auto;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    overflow-x: auto; /* Cho phép scroll ngang khi cần */
 }
 
 /* === Tiêu đề === */
@@ -19,6 +20,7 @@ h2 {
 /* === Bảng === */
 .raw-materials-table {
     width: 100%;
+    min-width: 900px; 
     border-collapse: collapse;
     margin-top: 20px;
 }
@@ -32,12 +34,14 @@ h2 {
 .raw-materials-table thead tr {
     border-bottom: 2px solid #aaa;
 }
-
 /* Ô bảng */
 .raw-materials-table th,
 .raw-materials-table td {
     padding: 8px;
     border: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* Header */
@@ -76,14 +80,12 @@ h2 {
 .raw-materials-table span[style="color: green"] {
     color: green;
 }
-
 /* === Link bổ sung hàng === */
 .bo-sung-link {
     color: #0d6efd;
     text-decoration: none;
     font-weight: 500;
 }
-
 .bo-sung-link:hover {
     text-decoration: underline;
 }

@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./ActivityDetails.css";
 import { ToastContainer, toast } from 'react-toastify';
 
 const ActivityDetails = ({ onSave, onCancel }) => {
-
+    const navigate = useNavigate();
     const inputIndexRef = useRef(null);
 
     const [activeTab, setActiveTab] = useState("moTa");
@@ -24,14 +25,12 @@ const ActivityDetails = ({ onSave, onCancel }) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState(null);
     const [previewUrl, setPreviewUrl] = useState(null);
-
-    // biến để lấy ra mã quy trình đi validate coi có thứ tự chưa
-    const [processId, setProcessId] = useState('')
+    const [processId, setProcessId] = useState('');
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         if (name === 'maQuyTrinh') {
-            setProcessId(value)
+            setProcessId(value);
         }
         setNewActivity(prev => ({ ...prev, [name]: value }));
     };
@@ -44,6 +43,7 @@ const ActivityDetails = ({ onSave, onCancel }) => {
             } catch (error) {
                 console.error("Lỗi khi lấy danh sách quy trình:", error);
                 setError("Không thể tải danh sách quy trình sản xuất");
+                notify_error("Không thể tải danh sách quy trình sản xuất");
             }
         };
 
@@ -55,19 +55,18 @@ const ActivityDetails = ({ onSave, onCancel }) => {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
 
-            // Kiểm tra loại file
             if (file.type !== "application/pdf") {
                 setError("Vui lòng chọn file PDF");
+                notify_error("Vui lòng chọn file PDF");
                 return;
             }
 
-            // Kiểm tra kích thước file (ví dụ: tối đa 5MB)
             if (file.size > 5 * 1024 * 1024) {
                 setError("Kích thước file không được vượt quá 5MB");
+                notify_error("Kích thước file không được vượt quá 5MB");
                 return;
             }
 
-            // Tạo URL để xem trước
             const fileUrl = URL.createObjectURL(file);
             setPreviewUrl(fileUrl);
 
@@ -79,38 +78,30 @@ const ActivityDetails = ({ onSave, onCancel }) => {
         }
     };
 
-    const readFileAsByteArray = async (file) => {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => {
-                const arrayBuffer = reader.result;
-                const byteArray = new Uint8Array(arrayBuffer);
-                resolve(Array.from(byteArray));
-            };
-            reader.onerror = reject;
-            reader.readAsArrayBuffer(file);
-        });
-    };
-
     const validateForm = () => {
         if (!newActivity.maQuyTrinh) {
             setError("Vui lòng chọn quy trình");
+            notify_error("Vui lòng chọn quy trình");
             return false;
         }
         if (!newActivity.hoatDong.trim()) {
             setError("Vui lòng nhập tên hoạt động");
+            notify_error("Vui lòng nhập tên hoạt động");
             return false;
         }
         if (!newActivity.congDoan.trim()) {
             setError("Vui lòng nhập công đoạn sản xuất");
+            notify_error("Vui lòng nhập công đoạn sản xuất");
             return false;
         }
         if (!newActivity.thuTu || isNaN(newActivity.thuTu)) {
             setError("Vui lòng nhập trình tự hợp lệ");
+            notify_error("Vui lòng nhập trình tự hợp lệ");
             return false;
         }
         if (!newActivity.thoiGianMacDinh || isNaN(newActivity.thoiGianMacDinh)) {
             setError("Vui lòng nhập thời gian mặc định hợp lệ");
+            notify_error("Vui lòng nhập thời gian mặc định hợp lệ");
             return false;
         }
         return true;
@@ -118,14 +109,13 @@ const ActivityDetails = ({ onSave, onCancel }) => {
 
     const handleSave = async () => {
         if (isSubmitting) return;
-
         if (!validateForm()) return;
 
         setIsSubmitting(true);
         setError(null);
 
         try {
-            // Bước 1: Tạo hoạt động mới
+            // Tạo hoạt động mới
             const activityData = new FormData();
             activityData.append("MaQuyTrinh", newActivity.maQuyTrinh);
             activityData.append("TenHoatDong", newActivity.hoatDong);
@@ -146,21 +136,17 @@ const ActivityDetails = ({ onSave, onCancel }) => {
                 }
             );
 
-            console.log("Phản hồi từ server khi tạo hoạt động:", response.data);
             const maHoatDong = response.data.maHoatDong;
-
             if (!maHoatDong) {
                 throw new Error("Không nhận được mã hoạt động từ server");
             }
 
-            // Bước 2: Nếu có file PDF, thực hiện upload riêng
+            // Upload file PDF nếu có
             if (newActivity.banVe) {
                 try {
-                    console.log("Bắt đầu upload file PDF...");
                     const fileData = new FormData();
-                    fileData.append("file", newActivity.banVe); // Đổi tên param để rõ ràng
+                    fileData.append("file", newActivity.banVe);
 
-                    // Gọi API upload nhưng KHÔNG sử dụng dữ liệu trả về
                     await axios.post(
                         `https://localhost:7135/api/ChiTietHoatDongSanXuats/${maHoatDong}/upload`,
                         fileData,
@@ -170,24 +156,27 @@ const ActivityDetails = ({ onSave, onCancel }) => {
                             }
                         }
                     );
-
-                    console.log("Upload file thành công");
                 } catch (uploadError) {
                     console.error("Lỗi khi upload file:", uploadError);
-                    // Vẫn tiếp tục dù upload file thất bại
-                    notify_success("Lưu hoạt động thành công nhưng upload file không thành công");
+                    notify_error("Lưu hoạt động thành công nhưng upload file không thành công");
                 }
             }
 
             notify_success("Lưu hoạt động thành công!");
-            // Sử dụng dữ liệu từ response tạo hoạt động ban đầu
+            
+            // Xử lý sau khi lưu thành công
             setTimeout(() => {
-                onSave(response.data);
+                if (typeof onSave === 'function') {
+                    onSave(response.data);
+                } else {
+                    navigate(-1); // Mặc định quay lại trang trước nếu không có onSave
+                }
             }, 2000);
+
         } catch (error) {
             console.error("Lỗi trong quá trình lưu:", error);
-
             let errorMessage = "Lưu thất bại, vui lòng thử lại!";
+            
             if (error.response) {
                 errorMessage = error.response.data?.message ||
                     error.response.data?.title ||
@@ -197,16 +186,56 @@ const ActivityDetails = ({ onSave, onCancel }) => {
             }
 
             setError(errorMessage);
+            notify_error(errorMessage);
         } finally {
             setIsSubmitting(false);
         }
     };
+
     const handleCancel = () => {
-        // Giải phóng bộ nhớ khi hủy
         if (previewUrl) {
             URL.revokeObjectURL(previewUrl);
         }
-        onCancel();
+        if (typeof onCancel === 'function') {
+            onCancel();
+        } else {
+            navigate(-1); // Mặc định quay lại trang trước nếu không có onCancel
+        }
+    };
+
+    const checkThuTu = async (e) => {
+        const index = e.target.value;
+
+        if (index === "" || isNaN(index)) {
+            notify_error('Hãy điền vào ô trình tự');
+            inputIndexRef.current.style.borderColor = 'red';
+            return;
+        }
+
+        const requestbody = {
+            maQuyTrinh: processId,
+            thuTu: index
+        };
+
+        try {
+            const response = await axios.post(
+                'https://localhost:7135/api/ChiTietHoatDongSanXuats/kiem-tra-thu-tu', 
+                requestbody
+            );
+
+            if (response.data.success === false) {
+                notify_error(response.data.message);
+                inputIndexRef.current.value = '';
+                inputIndexRef.current.style.borderColor = 'red';
+            }
+        } catch (error) {
+            console.error("Lỗi khi kiểm tra thứ tự:", error);
+            notify_error("Có lỗi xảy ra khi kiểm tra thứ tự");
+        }
+    };
+
+    const handleFocus = () => {
+        inputIndexRef.current.style.borderColor = 'black';
     };
 
     // Clean up preview URL khi component unmount
@@ -217,33 +246,6 @@ const ActivityDetails = ({ onSave, onCancel }) => {
             }
         };
     }, [previewUrl]);
-
-    const checkThuTu = async (e) => {
-        var index = e.target.value
-
-        if (index === "" || isNaN(index)) {
-            notify_error('Hãy điền vào ô trình tự')
-            inputIndexRef.current.style.borderColor = 'red'
-            return
-        }
-
-        var requestbody = {
-            maQuyTrinh: processId,
-            thuTu: index
-        }
-
-        const response = await axios.post('https://localhost:7135/api/ChiTietHoatDongSanXuats/kiem-tra-thu-tu', requestbody)
-
-        if (response.data.success === false) {
-            notify_error(response.data.message)
-            inputIndexRef.current.value = ''
-            inputIndexRef.current.style.borderColor = 'red'
-        }
-    }
-
-    const handleFocus = () => {
-        inputIndexRef.current.style.borderColor = 'black'
-    };
 
     return (
         <div className="modal-overlay">
@@ -304,7 +306,7 @@ const ActivityDetails = ({ onSave, onCancel }) => {
                             name="thuTu"
                             value={newActivity.thuTu}
                             onChange={handleChange}
-                            onBlur={(e) => checkThuTu(e)}
+                            onBlur={checkThuTu}
                             required
                             disabled={isSubmitting}
                             min="1"

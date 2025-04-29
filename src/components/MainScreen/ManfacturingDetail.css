@@ -83,14 +83,14 @@
 }
 
 .man-det-td {
-    height: 60px;
+    height: 42px;
     font-weight: 400;
 }
 
 .add-workorder {
     color: #3E58CE;
     text-align: left;
-    width: 1500%;
+    width: 1000%;
     margin: auto;
     background-color: #96bef7;
     height: 35px;
@@ -121,7 +121,7 @@
 
 .modal-content {
     background-color: white;
-    padding-right: 30px;
+    padding: 30px;
     border-radius: 10px;
     width: 600px;
     max-height: 90vh;
@@ -185,13 +185,5 @@
   }
   .link-process:hover {
     color: #1565c0;
-  }
-
-  .btn-action {
-    border-width: 0;
-    color: white;
-    height: 30; display : 'flex'; 
-    justify-content: 'center'; 
-    align-items: 'center'
   }
 
