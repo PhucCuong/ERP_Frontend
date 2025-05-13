@@ -14,6 +14,9 @@ import './Menu.css';
 import { jwtDecode } from 'jwt-decode';
 
 const Menu = ({ setUserName }) => {
+
+    const [openReportSubmenu, setOpenReportSubmenu] = useState(false);
+
     const [page, setPage] = useState('');
     const [user, setUser] = useState({});
     const [open, setOpen] = useState(false); // Toggle dropdown
@@ -86,6 +89,7 @@ const Menu = ({ setUserName }) => {
 
             <div className='btn-menu-group'>
 
+                {/* DANH MỤC SẢN XUẤT */}
                 <div
                     onClick={() => setOpenCategory(!openCategory)}
                     className='btn-menu'
@@ -118,10 +122,12 @@ const Menu = ({ setUserName }) => {
                             renderNavLink('/workcenters', 'Nhà máy', <RiBuilding2Fill />, 'workcenters')}
                         {allowedRoles.workCenter.includes(user.role) &&
                             renderNavLink('/NhaCungCap', 'Nhà cung cấp', <RiBuilding2Fill />, 'NhaCungCap')}
-                            {allowedRoles.workCenter.includes(user.role) &&
+                        {allowedRoles.workCenter.includes(user.role) &&
                             renderNavLink('/GiaoHang', 'Đơn hàng vật liệu', <RiBuilding2Fill />, 'GiaoHang')}
                     </div>
                 )}
+
+                {/* HOẠT ĐỘNG SẢN XUẤT */}
                 <div
                     onClick={() => setOpen(!open)}
                     className='btn-menu'
@@ -153,19 +159,54 @@ const Menu = ({ setUserName }) => {
                             renderNavLink('/manfacturingorders', 'Kế hoạch sản xuất', <GrPlan />, 'manfacturingorders')}
                         {allowedRoles.workOrder.includes(user.role) &&
                             renderNavLink('/workorders', 'Lệnh sản xuất', <GrUserWorker />, 'workorders')}
-
                         {allowedRoles.scrap.includes(user.role) &&
                             renderNavLink('/quality', 'Kiểm tra chất lượng', <IoTrashBinOutline />, 'quality')}
-
                         {allowedRoles.unbuild.includes(user.role) &&
                             renderNavLink('/unbuildorders', 'Lệnh gỡ bỏ', <MdInsertPageBreak />, 'unbuildorders')}
                         {allowedRoles.process.includes(user.role) &&
                             renderNavLink('/productionprocess', 'Quy trình sản xuất', <AiOutlineRetweet />, 'productionprocess')}
 
-                        {allowedRoles.report.includes(user.role) &&
-                            renderNavLink('/reportings', 'Báo cáo sản xuất', <BsReception4 />, 'reportings')}
+                        {/* BÁO CÁO SẢN XUẤT - có submenu con */}
+                        {allowedRoles.report.includes(user.role) && (
+                            <>
+                                <div
+                                    onClick={() => setOpenReportSubmenu(!openReportSubmenu)}
+                                    style={{
+                                        padding: '10px 20px',
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                        backgroundColor: '#4F6BED',
+                                        color: '#fff'
+                                    }}
+                                >
+                                    <span>
+                                        <BsReception4 style={{ marginRight: 8 }} />
+                                        Báo cáo sản xuất
+                                    </span>
+                                    <FaChevronDown
+                                        style={{
+                                            transition: 'transform 0.3s ease',
+                                            transform: openReportSubmenu ? 'rotate(180deg)' : 'rotate(0deg)'
+                                        }}
+                                    />
+                                </div>
+
+                                {openReportSubmenu && (
+                                    <div className='submenu' style={{ paddingLeft: 24 }}>
+                                        {renderNavLink('/reportings/progress', 'Báo cáo tiến độ sản xuất', <BsReception4 />, 'reportings-progress')}
+                                        {renderNavLink('/reportings/overview', 'Báo cáo tổng quan sản phẩm', <BsReception4 />, 'reportings-overview')}
+                                        {renderNavLink('/reportings/quality', 'Báo cáo chất lượng', <BsReception4 />, 'reportings-quality')}
+                                        {renderNavLink('/reportings/cost', 'Báo cáo chi phí sản xuất', <BsReception4 />, 'reportings-cost')}
+                                    </div>
+                                )}
+                            </>
+                        )}
                     </div>
                 )}
+
+                {/* KHO */}
                 <div
                     onClick={() => setOpenWarehouse(!openWarehouse)}
                     className='btn-menu'
@@ -197,10 +238,9 @@ const Menu = ({ setUserName }) => {
                     </div>
                 )}
             </div>
-
         </div>
-
     );
+
 };
 
 export default Menu;
