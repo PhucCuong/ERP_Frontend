@@ -3,9 +3,8 @@ import { FaSearch } from "react-icons/fa";
 import { useState, useEffect, useRef } from 'react';
 import { FaPencil } from "react-icons/fa6";
 import Spinner from 'react-bootstrap/Spinner';
-import { AiOutlineClose } from "react-icons/ai";
 import { ToastContainer, toast } from 'react-toastify';
-
+import { BsXSquare } from "react-icons/bs";
 import axios from 'axios';
 
 
@@ -104,87 +103,6 @@ const Bom = () => {
     }, [products, materials, boms])
 
 
-    //     {
-    //         "maDinhMuc": 1,
-    //         "tenSanPham": "Bàn làm việc",
-    //         "nguyenVatLieus": [
-    //             {
-    //                 "maNguyenVatLieu": 1,
-    //                 "tenNguyenVatLieu": "Ốc vít",
-    //                 "soLuong": 20
-    //             },
-    //             {
-    //                 "maNguyenVatLieu": 2,
-    //                 "tenNguyenVatLieu": "Gỗ",
-    //                 "soLuong": 10
-    //             },
-    //             {
-    //                 "maNguyenVatLieu": 3,
-    //                 "tenNguyenVatLieu": "Keo",
-    //                 "soLuong": 13
-    //             }
-    //         ],
-    //         "soLuong": 2,
-    //         "mucDoSuDung": 'Nhiều',
-    //         "thoiGianSanXuat": '20h',
-    //         "ngayTao": '12-12/2012',
-    //         "ngayChinhSua": '12-12/2012'
-    //     },
-    //     {
-    //         "maDinhMuc": 2,
-    //         "tenSanPham": "Ghế công thái học",
-    //         "nguyenVatLieus": [
-    //             {
-    //                 "maNguyenVatLieu": 2,
-    //                 "tenNguyenVatLieu": "Ốc vít",
-    //                 "soLuong": 24
-    //             },
-    //             {
-    //                 "maNguyenVatLieu": 4,
-    //                 "tenNguyenVatLieu": "Gỗ",
-    //                 "soLuong": 23
-    //             },
-    //             {
-    //                 "maNguyenVatLieu": 6,
-    //                 "tenNguyenVatLieu": "Keo",
-    //                 "soLuong": 34
-    //             }
-    //         ],
-    //         "soLuong": 4,
-    //         "mucDoSuDung": 'Nhiều',
-    //         "thoiGianSanXuat": '20h',
-    //         "ngayTao": '12-12/2012',
-    //         "ngayChinhSua": '12-12/2012'
-    //     },
-    //     {
-    //         "maDinhMuc": 3,
-    //         "tenSanPham": "Kệ màn hình",
-    //         "nguyenVatLieus": [
-    //             {
-    //                 "maNguyenVatLieu": 3,
-    //                 "tenNguyenVatLieu": "Ốc vít",
-    //                 "soLuong": 34
-    //             },
-    //             {
-    //                 "maNguyenVatLieu": 6,
-    //                 "tenNguyenVatLieu": "Gỗ",
-    //                 "soLuong": 21
-    //             },
-    //             {
-    //                 "maNguyenVatLieu": 4,
-    //                 "tenNguyenVatLieu": "Keo",
-    //                 "soLuong": 15
-    //             }
-    //         ],
-    //         "soLuong": 5,
-    //         "mucDoSuDung": 'Nhiều',
-    //         "thoiGianSanXuat": '20h',
-    //         "ngayTao": '12-12/2012',
-    //         "ngayChinhSua": '12-12/2012'
-    //     },
-    // ]
-
-
     // hàm nhấn vào một dòng của Bom
     const getBomDetailFromProductCode = (product) => {
         setProductId(product.maSanPham)
@@ -208,7 +126,7 @@ const Bom = () => {
     }
 
     const deleteMaterialOfBom = async (bomid) => {
-        console.log(bomid)
+        
         await axios.delete(`https://localhost:7135/api/DinhMucNguyenVatLieux/${bomid}`)
         .then(response => {
             notify_success('Xóa thành công.')
@@ -225,7 +143,7 @@ const Bom = () => {
             </div>
             <div className='bom-content'>
                 <div className='bom-filter-row'>
-                    <button className='create-bom-btn'>New</button>
+                    {/* <button className='create-bom-btn'>New</button> */}
                     <input className='bom-filter-input' placeholder='Search.....' />
                     <FaSearch className='search-icon' />
                 </div>
@@ -295,7 +213,7 @@ const Bom = () => {
                                         >
                                             <div>{item.materialsName}</div>
                                             <div style={{marginLeft: 40}}>{item.quantity}</div>
-                                            <button className='delete-row' onClick={() => deleteMaterialOfBom(item.bomCode)}><AiOutlineClose /></button>
+                                            <button className='delete-row' onClick={() => deleteMaterialOfBom(item.bomCode)}>X</button>
                                         </div>
                                     ))
                                 }
@@ -362,7 +280,6 @@ const ModalAddMaterial = ({ setIsOpenModal, productId, setLoading, callapi }) =>
     }
 
     const addMaterial = () => {
-        console.log(selectedValue)
 
         const ngaytao = getFormattedDate()
         const requestBody = {
@@ -419,7 +336,7 @@ const ModalAddMaterial = ({ setIsOpenModal, productId, setLoading, callapi }) =>
                     }}
                     onClick={() => setIsOpenModal(false)}
                 >
-                    <AiOutlineClose />
+                    <BsXSquare />
                 </button>
                 <div style={{
                     color: '#3E58CE',

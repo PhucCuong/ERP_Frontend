@@ -54,7 +54,7 @@ const Login = ({ onLogin, onRegister }) => {
                             <button className='button login-btn' onClick={handleLogin}>Login</button>
                         </div>
                     </div>
-                    <button className='button login-google' onClick={handleGoogleLogin}>Log in with Google</button>
+                    {/* <button className='button login-google' onClick={handleGoogleLogin}>Log in with Google</button> */}
                 </div>
             </div>
             {loading && <Loading />}

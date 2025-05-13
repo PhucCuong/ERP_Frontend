@@ -19,13 +19,15 @@ import AddPlant from "./AddPlant"
 import TonKho from "./tonkho";
 import AddNhaCungCap from "./NhaCungCap";
 import ActivityDetails from "./ActivityDetails";
+import DashBoard from "./DashBoard"
 import GiaoHang from "./GiaoHang";
 const MainScreen = ({userName}) => {
     return (
         <div className="mainscreen_container">
             <Routes>
-                <Route path="/" element={<Navigate to="/bom" />} />
+                <Route path="/" element={<Navigate to="/dashboard" />} />
 
+                <Route path="/dashboard" element={<DashBoard />} />
                 <Route path="/bom" element={<Bom />} />
                 <Route path="/raw-materials" element={<RawMaterials />} />
                 <Route path="/products" element={<Products />} />

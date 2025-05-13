@@ -1,0 +1,109 @@
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f5f7fa;
+}
+
+.dashboard {
+    padding: 30px;
+    max-width: 1200px;
+    margin: auto;
+}
+
+.dashboard-header h1 {
+    font-size: 28px;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.dashboard-header p {
+    color: #666;
+    margin-bottom: 30px;
+}
+
+.stats {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 40px;
+}
+
+.card {
+    flex: 1;
+    min-width: 220px;
+    padding: 20px;
+    border-radius: 12px;
+    color: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: transform 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card h3 {
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+.card p {
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.card-blue { background-color: #3b82f6; }
+.card-green { background-color: #10b981; }
+.card-orange { background-color: #f97316; }
+.card-red { background-color: #ef4444; }
+
+.progress-section {
+    margin-bottom: 40px;
+}
+
+.progress-section h2 {
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.progress-bar-container {
+    background-color: #e5e7eb;
+    border-radius: 12px;
+    overflow: hidden;
+    height: 20px;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 100%;
+    background-color: #d1d5db;
+    position: relative;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background-color: #10b981;
+    transition: width 0.4s ease;
+}
+
+.notifications h2 {
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.notifications ul {
+    list-style: none;
+    padding-left: 0;
+    line-height: 1.8;
+    color: #444;
+}
+
+.notifications li::before {
+    content: "•";
+    color: #3b82f6;
+    display: inline-block;
+    width: 1em;
+    margin-left: -1em;
+}

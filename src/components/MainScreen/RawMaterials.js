@@ -123,23 +123,23 @@ const RawMaterials = () => {
                             height: '85%'
                         }}>
                             <div className='materials-detail-column'>
-                                <div className='materials-detail-label'>Materials name</div>
+                                <div className='materials-detail-label'>Tên nguyên vật liệu</div>
                                 <input className='materials-detail-input' ref={nameRef} />
-                                <div className='materials-detail-label'>Barcode</div>
+                                <div className='materials-detail-label'>Mã vạch</div>
                                 <input className='materials-detail-input' ref={barcodeRef} readOnly />
-                                <div className='materials-detail-label'>Materials type</div>
+                                <div className='materials-detail-label'>Loại nguên vật liệu</div>
                                 <input className='materials-detail-input' ref={typeRef} />
-                                <div className='materials-detail-label'>Unit</div>
+                                <div className='materials-detail-label'>Đơn vị</div>
                                 <input className='materials-detail-input' ref={unitRef} />
                             </div>
                             <div className='materials-detail-column'>
-                                <div className='materials-detail-label'>Costs</div>
+                                <div className='materials-detail-label'>Chi Phí</div>
                                 <input className='materials-detail-input' ref={costsRef} />
-                                <div className='materials-detail-label'>Minimum stock quantity</div>
+                                <div className='materials-detail-label'>Số lượng tồn kho tối thiểu</div>
                                 <input className='materials-detail-input' ref={miniStockRef} />
-                                <div className='materials-detail-label'>Maximum stock quantity</div>
+                                <div className='materials-detail-label'>Số lượng tồn kho tối đa</div>
                                 <input className='materials-detail-input' ref={maxStockRef} />
-                                <div className='materials-detail-label'>Status</div>
+                                <div className='materials-detail-label'>Trạng thái</div>
                                 <input className='materials-detail-input' ref={statusRef} />
                             </div>
                         </div>

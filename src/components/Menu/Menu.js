@@ -119,7 +119,7 @@ const Menu = ({ setUserName }) => {
                         {allowedRoles.workCenter.includes(user.role) &&
                             renderNavLink('/NhaCungCap', 'Nhà cung cấp', <RiBuilding2Fill />, 'NhaCungCap')}
                             {allowedRoles.workCenter.includes(user.role) &&
-                            renderNavLink('/GiaoHang', 'Đơn hàng vật liệu', <RiBuilding2Fill />, 'NhaCungCap')}
+                            renderNavLink('/GiaoHang', 'Đơn hàng vật liệu', <RiBuilding2Fill />, 'GiaoHang')}
                     </div>
                 )}
                 <div
