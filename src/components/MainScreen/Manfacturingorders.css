@@ -10,14 +10,17 @@
 
 .manfacturing-new-button {
     background-color: #1FA9FD;
-    width: 105px;
+    width: 10%;
     height: 40px;
     border: 0px;
     outline: none;
     color: #ffffff;
     font-size: 18px;
-    font-weight: bold;
     margin-left: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
 }
 
 .manfacturing-filter-input {

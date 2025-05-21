@@ -68,7 +68,7 @@ const WorkCenter = () => {
 
     return (
         <div className="work-center-container">
-            <div className="work-center-header">Work Centers</div>
+            <div className="work-center-header">Nhà máy</div>
 
             <div className="work-center-content">
                 <div className="work-center-controls">
@@ -86,7 +86,7 @@ const WorkCenter = () => {
                                 chiPhi: ""
                             });
                         }}>
-                        <Plus size={16} /> Add Work Center
+                        <Plus size={16} /> Thêm nhà máy
                     </button>
 
                     <div className="work-center-search">
@@ -103,22 +103,22 @@ const WorkCenter = () => {
 
                 {showForm && (
                     <form className="work-center-form" onSubmit={handleAddOrUpdateWorkCenter}>
-                        <h3 className="work-center-form-title">{editingWorkCenter ? "Edit Work Center" : "Add New Work Center"}</h3>
+                        <h3 className="work-center-form-title">{editingWorkCenter ? "Chỉnh sửa thông tin nhà máy" : "Thêm nhà máy"}</h3>
 
-                        <input type="text" placeholder="Work Center Name" required className="work-center-input"
+                        <input type="text" placeholder="Tên nhà máy" required className="work-center-input"
                             value={newWorkCenter.tenNhaMay} onChange={(e) => setNewWorkCenter({ ...newWorkCenter, tenNhaMay: e.target.value })} />
-                        <input type="text" placeholder="Categorization" required className="work-center-input"
+                        <input type="text" placeholder="Phân loại" required className="work-center-input"
                             value={newWorkCenter.phanLoai} onChange={(e) => setNewWorkCenter({ ...newWorkCenter, phanLoai: e.target.value })} />
-                        <input type="text" placeholder="Address" required className="work-center-input"
+                        <input type="text" placeholder="Địa chỉ" required className="work-center-input"
                             value={newWorkCenter.diaChi} onChange={(e) => setNewWorkCenter({ ...newWorkCenter, diaChi: e.target.value })} />
-                        <input type="text" placeholder="Phone Number" required className="work-center-input"
+                        <input type="text" placeholder="Số điện thoại" required className="work-center-input"
                             value={newWorkCenter.soDienThoai} onChange={(e) => setNewWorkCenter({ ...newWorkCenter, soDienThoai: e.target.value })} />
-                        <input type="text" placeholder="Manager" required className="work-center-input"
+                        <input type="text" placeholder="Quản lý" required className="work-center-input"
                             value={newWorkCenter.nguoiQuanLy} onChange={(e) => setNewWorkCenter({ ...newWorkCenter, nguoiQuanLy: e.target.value })} />
-                        <input type="number" placeholder="Cost" required className="work-center-input"
+                        <input type="number" placeholder="Chi phí" required className="work-center-input"
                             value={newWorkCenter.chiPhi} onChange={(e) => setNewWorkCenter({ ...newWorkCenter, chiPhi: e.target.value })} />
                         <div className="work-center-form-actions">
-                            <button type="submit" className="work-center-button">{editingWorkCenter ? "Update" : "Submit"}</button>
+                            <button type="submit" className="work-center-button" style={{width: 100, textAlign: 'center'}}>{editingWorkCenter ? "Lưu" : "Thêm"}</button>
                             <button
                                 type="button"
                                 className="work-center-button exit-button"
@@ -136,13 +136,13 @@ const WorkCenter = () => {
                     <table className="work-center-table">
                         <thead>
                             <tr className="work-center-table-header">
-                                <th>Name</th>
-                                <th>Categorization</th>
-                                <th>Address</th>
-                                <th>Phone</th>
-                                <th>Manager</th>
-                                <th>Cost</th>
-                                <th>Actions</th>
+                                <th>Tên nhà máy</th>
+                                <th>Phân loại</th>
+                                <th>Địa chỉ</th>
+                                <th>SDT</th>
+                                <th>Quản lý</th>
+                                <th>Chi phí</th>
+                                <th>Hành động</th>
                             </tr>
                         </thead>
                         <tbody>

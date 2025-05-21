@@ -73,7 +73,7 @@ const ReportProgress = () => {
                     '#36A2EB',
                     '#FFCE56',
                     '#FF9F40',
-                    '#A9A9A9'
+                    '#CC0000'
                 ],
             },
         ],
@@ -198,7 +198,7 @@ const ReportProgress = () => {
                     <li style={{ marginTop: 10, fontSize: 20, color: '#36A2EB' }}><strong>Hoàn thành: {report.soLenhSanXuatHoanThanh} </strong> </li>
                     <li style={{ marginTop: 10, fontSize: 20, color: '#FFCE56' }}><strong>Đang thực hiện: {report.soLenhSanXuatDangThucHien} </strong></li>
                     <li style={{ marginTop: 10, fontSize: 20, color: '#FF9F40' }}><strong>Tạm dừng: {report.soLenhSanXuatTamDung} </strong></li>
-                    <li style={{ marginTop: 10, fontSize: 20, color: '#A9A9A9' }}><strong>Bị khóa: {report.soLenhSanXuatBiKhoa} </strong></li>
+                    <li style={{ marginTop: 10, fontSize: 20, color: '#CC0000' }}><strong>Bị khóa: {report.soLenhSanXuatBiKhoa} </strong></li>
                 </ul>
             </div>
 

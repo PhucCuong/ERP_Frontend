@@ -193,14 +193,7 @@ const ActivityDetails = ({ onSave, onCancel }) => {
     };
 
     const handleCancel = () => {
-        if (previewUrl) {
-            URL.revokeObjectURL(previewUrl);
-        }
-        if (typeof onCancel === 'function') {
-            onCancel();
-        } else {
-            navigate(-1); // Mặc định quay lại trang trước nếu không có onCancel
-        }
+        navigate("/productionprocess")
     };
 
     const checkThuTu = async (e) => {

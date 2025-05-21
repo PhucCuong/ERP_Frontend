@@ -175,8 +175,8 @@ const ReportQuality = () => {
             </div>
 
             <div style={{ width: '40%', margin: '80px auto' }}>
-                <h4 style={{ textAlign: 'center' }}>Biểu đồ chất lượng sản phẩm</h4>
                 <Pie data={pieChartData} />
+                <h4 style={{ textAlign: 'center' , marginTop: 30}}>Biểu đồ chất lượng sản phẩm</h4>
             </div>
 
             <ToastContainer theme="colored" />

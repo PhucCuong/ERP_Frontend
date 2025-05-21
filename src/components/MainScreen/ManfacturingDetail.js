@@ -213,7 +213,7 @@ const ManfacturingDetail = ({ userName }) => {
         }
     }
 
-    const handleStop = async (maLenh, trangthaithaydoi, trangthaihientai, thutu , soluongnhapkho) => {
+    const handleStop = async (maLenh, trangthaithaydoi, trangthaihientai, thutu, soluongnhapkho) => {
         setTimers(prev => ({ ...prev, [maLenh]: 'stopped' }));
 
         await callApiChangeStatus(maLenh, trangthaithaydoi, trangthaihientai)
@@ -242,8 +242,11 @@ const ManfacturingDetail = ({ userName }) => {
 
     return (
         <div>
-            <div className="header">
-                Xem lệnh sản xuất</div>
+            <div className="header"
+                style={{marginTop: 10, marginLeft: 20}}
+            >
+                Xem lệnh sản xuất
+            </div>
             <button className='manfacturing-detail-close-button' onClick={() => clickBackManfacturingOrders()}>
                 {/* <IoMdClose className='manfacturing-detail-close-icon' /> */}
                 X
@@ -294,7 +297,7 @@ const ManfacturingDetail = ({ userName }) => {
                 marginLeft: 70,
                 marginTop: 20,
                 color: '#18A2B8'
-            }}>Bill of material :</div>
+            }}>Định mức nguyên liệu :</div>
             <table className='man-det-table'>
                 <thead>
                     <tr className='man-det-table-title'>
@@ -323,7 +326,7 @@ const ManfacturingDetail = ({ userName }) => {
                 marginLeft: 70,
                 marginTop: 20,
                 color: '#18A2B8'
-            }}>Work orders :</div>
+            }}>Lệnh sản xuất :</div>
             <table className='man-det-table'>
                 <thead>
                     <tr className='man-det-table-title'>
@@ -340,7 +343,7 @@ const ManfacturingDetail = ({ userName }) => {
                         <th className='man-det-th'>Thời gian Thực tế</th>
                         <th className='man-det-th'>Người kí</th>
                         <th className='man-det-th'>Trạng thái</th>
-                        <th className='man-det-th'>Thaop tác</th>
+                        <th className='man-det-th'>Thao tác</th>
                         <th className='man-det-th'>Xóa</th>
                     </tr>
                 </thead>
@@ -364,9 +367,9 @@ const ManfacturingDetail = ({ userName }) => {
                                         }
                                     </td>
                                     <td className='man-det-td' >{llv.soLuong}</td>
-                                    <td className='man-det-td' style={{ width: '15%' }}>{llv.khuVucSanXuat}</td>
-                                    <td className='man-det-td' style={{ color: '#FF3399' }}>{llv.ngayBatDau}</td>
-                                    <td className='man-det-td' style={{ color: '#FF3399' }}>{llv.ngayKetThuc}</td>
+                                    <td className='man-det-td' style={{ width: '15%', width: '20%' }}>{llv.khuVucSanXuat}</td>
+                                    <td className='man-det-td' style={{ color: '#FF3399' }}>{llv.ngayBatDau.slice(0, 10)}</td>
+                                    <td className='man-det-td' style={{ color: '#FF3399' }}>{llv.ngayKetThuc.slice(0, 10)}</td>
                                     <td className='man-det-td' style={{ width: '10%' }}>{convertMinutesToMinutesSeconds(llv.thoiGianDuKien)}</td>
                                     <td className='man-det-td' style={{ width: '10%' }}>
                                         <ThoiGianThucTeCell
@@ -442,7 +445,7 @@ const ManfacturingDetail = ({ userName }) => {
                                                 :
                                                 (
                                                     llv.trangThai === "Ready" ? <ReadyState handleStart={handleStart} maLenh={llv.maLenh} currentState={llv.trangThai} thuTu={llv.thuTu} /> :
-                                                        llv.trangThai === "Inprogress" ? <InprogressState handlePause={handlePause} handleStop={handleStop} maLenh={llv.maLenh} currentState={llv.trangThai} thuTu={llv.thuTu} soluongnhapkho={llv.soLuong}/> :
+                                                        llv.trangThai === "Inprogress" ? <InprogressState handlePause={handlePause} handleStop={handleStop} maLenh={llv.maLenh} currentState={llv.trangThai} thuTu={llv.thuTu} soluongnhapkho={llv.soLuong} /> :
                                                             llv.trangThai === "Pause" ? <PauseState handleStart={handleStart} handleStop={handleStop} maLenh={llv.maLenh} currentState={llv.trangThai} thuTu={llv.thuTu} /> :
                                                                 llv.trangThai === "Block" ? <BlockState /> : <div></div>
                                                 )
@@ -467,7 +470,7 @@ const ManfacturingDetail = ({ userName }) => {
                             )
                         })
                     }
-                    <div className='add-workorder' onClick={() => openModal()}>Add work order</div>
+                    <div className='add-workorder' onClick={() => openModal()}>Thêm lệnh sản xuất</div>
                 </tbody>
             </table>
 
@@ -839,7 +842,7 @@ const ReadyState = ({ handleStart, maLenh, currentState, thuTu }) => {
     )
 }
 
-const InprogressState = ({ handlePause, handleStop, maLenh, currentState, thuTu , soluongnhapkho}) => {
+const InprogressState = ({ handlePause, handleStop, maLenh, currentState, thuTu, soluongnhapkho }) => {
     return (
         <div>
             <button onClick={() => handlePause(maLenh, "Pause", currentState)} className='btn-action' style={{ backgroundColor: '#CCCC00', marginTop: 5 }}>Pause</button>

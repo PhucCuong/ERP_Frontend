@@ -69,9 +69,9 @@ const Manfacturingorders = () => {
 
     return (
         <div>
-            <div className="product-header">Manfacturing Orders</div>
+            <div className="product-header">Kế hoạch sản xuất</div>
             <div className="manfactring-button-row">
-                <button className='manfacturing-new-button' onClick={clickCreatePlant}>New</button>
+                <button className='manfacturing-new-button' onClick={clickCreatePlant}>+ Thêm mới</button>
                 <input className='manfacturing-filter-input' />
                 <button className='manfacturing-search-button'><FaSearch /></button>
                 
@@ -87,12 +87,11 @@ const Manfacturingorders = () => {
             <table className='manfacturing-table'>
                 <thead>
                     <tr className='manfacturing-table-title'>
-                        <th>Plan ID</th>
-                        <th>Owner</th>
-                        <th>Product</th>
-                        <th>Quantity</th>
-                        <th>Start Date</th>
-                        <th>Creator</th>
+                        <th>Mã kế hoạch</th>
+                        <th>Sản phẩm</th>
+                        <th>Số lượng</th>
+                        <th>Ngày bắt đầu</th>
+                        <th>Người tạo</th>
                         <th>Factory</th>
                         <th>State</th>
                     </tr>
@@ -117,11 +116,10 @@ const Manfacturingorders = () => {
                             onDoubleClick={() => doubleClickRow(item)}
                         >
                             <td title={item.maKeHoach}>{item.maKeHoach}</td>
-                            <td className='blue-color'>{item.nguoiTao}</td>
                             <td>{item.tenSanPham}</td>
                             <td>{item.soLuong}</td>
                             <td>{item.ngayBatDauDuKien?.slice(0, 10)}</td>
-                            <td>{item.nguoiTao}</td>
+                            <td className='blue-color'>{item.nguoiTao}</td>
                             <td>{item.tenNhaMay}</td>
                             <td>
                                 <div

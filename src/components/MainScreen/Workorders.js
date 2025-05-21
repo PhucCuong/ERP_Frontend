@@ -75,15 +75,15 @@ const Workorders = () => {
             <table className='manfacturing-table'>
                 <thead>
                     <tr className='manfacturing-table-title'>
-                        <th>Work Order ID</th>
-                        <th>Plant ID</th>
-                        <th>Product</th>
-                        <th>Process Name</th>
-                        <th>Quantity</th>
-                        <th>Start date</th>
-                        <th>End date</th>
-                        <th>Responsible person</th>
-                        <th>State</th>
+                        <th>Mã Lệnh sản xuất</th>
+                        <th>Mã kế hoạch</th>
+                        <th>Sản phẩm</th>
+                        <th>Tên công việc</th>
+                        <th>Số lượng</th>
+                        <th>Ngày bắt đầu</th>
+                        <th>Ngày kết thúc</th>
+                        <th>Chịu trách nhiệm</th>
+                        <th>Trạng thái</th>
                     </tr>
                 </thead>
 

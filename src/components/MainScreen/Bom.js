@@ -139,7 +139,7 @@ const Bom = () => {
     return (
         <div className='bom-container'>
             <div className='bom-header'>
-                Bill Of Material
+                Định mức nguyên vật liệu
             </div>
             <div className='bom-content'>
                 <div className='bom-filter-row'>
@@ -150,8 +150,8 @@ const Bom = () => {
                 <div className='bom-content-row'>
                     <div className='bom-list'>
                         <div className='bom-list-title-row'>
-                            <div className='bom-list-title bom-list-title-left'>Product</div>
-                            <div className='bom-list-title bom-list-right'>Unit</div>
+                            <div className='bom-list-title bom-list-title-left'>Sản phẩm</div>
+                            <div className='bom-list-title bom-list-right'>Đơn vị</div>
                         </div>
                         <div style={{ overflowY: 'auto', height: 600 }}>
                             {
@@ -181,28 +181,28 @@ const Bom = () => {
 
                     {/* bom detail */}
                     <div className='bom-detail'>
-                        <div className='bom-detail-title'>Bom Detail</div>
+                        <div className='bom-detail-title'>Chi tiết định mức</div>
                         <div className='bom-detail-row'>
-                            <div className='bom-detail-label'>Product</div>
+                            <div className='bom-detail-label'>Sản phẩm</div>
                             <input className='bom-detail-input' value={productName} />
                             <FaPencil className='pencil-icon' />
                         </div>
                         <div className='bom-detail-row'>
-                            <div className='bom-detail-label'>Quantity</div>
+                            <div className='bom-detail-label'>Số lượng</div>
                             <input className='bom-detail-input' value={quantity} />
                             <FaPencil className='pencil-icon' />
                         </div>
                         <div className='bom-detail-row'>
-                            <div className='bom-detail-label'>Unit</div>
+                            <div className='bom-detail-label'>Đơn vị</div>
                             <input className='bom-detail-input' value={unit} />
                             <FaPencil className='pencil-icon' />
                         </div>
                         <div className='bom-detail-title' style={{ marginTop: 50 }}>Components</div>
                         <div className='bom-detail-table'>
                             <div className='bom-detail-table-title'>
-                                <div>Component</div>
-                                <div>Quantity</div>
-                                <div>Action</div>
+                                <div>Thành phần</div>
+                                <div>Số lượng</div>
+                                <div>Xóa</div>
                             </div>
                             <div className='tableBody'>
                                 {
@@ -218,7 +218,7 @@ const Bom = () => {
                                     ))
                                 }
                             </div>
-                            <div className='add-line-table' onClick={() => setIsOpenModal(true)}>Add a line</div>
+                            <div className='add-line-table' onClick={() => setIsOpenModal(true)}>Thêm dòng</div>
                         </div>
 
                         {isOpenModal && <ModalAddMaterial setIsOpenModal={setIsOpenModal} productId={productId} setLoading={setLoading} callapi={callapi} />}
@@ -410,7 +410,7 @@ const ModalAddMaterial = ({ setIsOpenModal, productId, setLoading, callapi }) =>
                         onMouseEnter={() => setHoverSaveButton(true)}
                         onMouseLeave={() => setHoverSaveButton(false)}
                         onClick={() => addMaterial()}
-                    >Save</button>
+                    >Lưu</button>
                 </div>
             </div>
         </div>

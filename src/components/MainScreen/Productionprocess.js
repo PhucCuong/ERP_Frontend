@@ -68,13 +68,6 @@ const Productionprocess = () => {
                 >
                     + Thêm quy trình
                 </button>
-                <div className="floating-new-activity-button">
-                    <button
-                        onClick={() => navigate("/add-activity")}
-                    >
-                        + Thêm hoạt động
-                    </button>
-                </div>
                 <input
                     className="manfacturing-filter-input"
                     placeholder="Search..."

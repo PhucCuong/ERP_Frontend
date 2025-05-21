@@ -121,16 +121,16 @@ const Product = () => {
 
     return (
         <div className='product-container'>
-            <div className="product-header">Products</div>
+            <div className="product-header">Sản phẩm</div>
             <div className='body'>
                 <div className='product-list'>
                     <button
                         className='create-new-product-btn'
                         onClick={() => clickCreateProduct()}
-                    >New</button>
+                    >Thêm</button>
                     <div className='product-title-row'>
-                        <div className='product-list-title product-list-title-left'>Product name</div>
-                        <div className='product-list-title product-list-title-right'>Price</div>
+                        <div className='product-list-title product-list-title-left'>Tên sản phẩm</div>
+                        <div className='product-list-title product-list-title-right'>Gía bán</div>
                     </div>
                     <div className='product-list-columns'>
                         {
@@ -244,49 +244,12 @@ const Product = () => {
                                             justifyContent: 'space-around',
                                             marginTop: 30,
                                         }}>
-                                            <button className='btn-delete' onClick={() => deleteProduct(item.maSanPham)}>Delete</button>
-                                            <button className='btn-edit' onClick={() => showEditModal(item)}>Edit</button>
+                                            <button className='btn-delete' onClick={() => deleteProduct(item.maSanPham)}>Xóa</button>
+                                            <button className='btn-edit' onClick={() => showEditModal(item)}>Sửa</button>
                                         </div>
                                     </div>
                                 );
                             }
-                            // if (maSanPham === '' && productList.length > 0) {
-                            //     return (
-                            //         <div key="default">
-                            //             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'center', width: 940, overflowX: 'auto', marginTop: 20 }}>
-                            //                 {productList[0].img.length > 0 ? (
-                            //                     productList[0].img.map((imgUrl, imgIndex) => (
-                            //                         <img key={imgIndex} src={`data:image/png;base64,${imgUrl}`} height={200}
-                            //                             style={{ objectFit: 'contain', border: '1px solid #ddd', borderRadius: 5 }}
-                            //                         />
-                            //                     ))
-                            //                 ) : (
-                            //                     <p>No images available</p>
-                            //                 )}
-                            //             </div>
-                            //             <div className='product-name-detail-row'>
-                            //                 <div className='product-name-detail-label'>Product Name : </div>
-                            //                 <div className='product-name-detail'>{productList[0].tenSanPham}</div>
-                            //             </div>
-                            //             <div className='product-detail-row'>
-                            //                 <div>Price : </div>
-                            //                 <div className='product-detail-value'>{productList[0].giaBan}</div>
-                            //             </div>
-                            //             <div className='product-detail-row'>
-                            //                 <div>Unit : </div>
-                            //                 <div className='product-detail-value'>{productList[0].donViTinh}</div>
-                            //             </div>
-                            //             <div className='product-detail-row'>
-                            //                 <div>Product Type : </div>
-                            //                 <div className='product-detail-value'>{productList[0].nhomSanPham}</div>
-                            //             </div>
-                            //             <div className='product-detail-row'>
-                            //                 <div>Description : </div>
-                            //                 <div className='product-detail-description'>{productList[0].moTa}</div>
-                            //             </div>
-                            //         </div>
-                            //     );
-                            // }
                         })
 
                     }
@@ -426,91 +389,92 @@ const FullScreenModal = ({ product, setIsOpen, callApiGetProducts, callApiGetPro
                         alignItems: "center",
                         justifyContent: "center",
                         marginLeft: "90%",
-                        color: "red",
-                        marginTop: 10
+                        color: "white",
+                        marginTop: 10,
+                        backgroundColor: 'red'
                     }}
                     onClick={closeModal}
                 >
-                    <AiOutlineClose />
+                    X
                 </button>
                 <h2 className="text-2xl mb-4">Chỉnh sửa sản phẩm</h2>
 
-                <div style={{ marginRight: "460px", fontWeight: "bold" }}>
-                    Product ID
+                <div style={{ width: "100%", marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <label style={{ width: "20%", fontWeight: "bold" }}>Mã sản phẩm</label>
+                    <input
+                        type="text"
+                        name="maSanPham"
+                        className="border p-2"
+                        style={{ width: "70%", borderRadius: 4, backgroundColor: "#f3f3f3" }}
+                        readOnly
+                        value={formData.maSanPham}
+                    />
                 </div>
-                <input
-                    type="text"
-                    name="maSanPham"
-                    className="border p-2 mb-2 w-80"
-                    style={{ width: "80%" }}
-                    readOnly
-                    value={formData.maSanPham}
-                />
 
-                <div style={{ marginRight: "440px", fontWeight: "bold" }}>
-                    Product name
+                <div style={{ width: "100%", marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <label style={{ width: "20%", fontWeight: "bold" }}>Tên sản phẩm</label>
+                    <input
+                        type="text"
+                        name="tenSanPham"
+                        className="border p-2"
+                        style={{ width: "70%", borderRadius: 4 }}
+                        value={formData.tenSanPham}
+                        onChange={handleChange}
+                        ref={productNameRef}
+                    />
                 </div>
-                <input
-                    type="text"
-                    name="tenSanPham"
-                    className="border p-2 mb-2 w-80"
-                    style={{ width: "80%" }}
-                    value={formData.tenSanPham}
-                    onChange={handleChange}
-                    ref={productNameRef}
-                />
 
-                <div style={{ marginRight: "500px", fontWeight: "bold" }}>
-                    Price
+                <div style={{ width: "100%", marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <label style={{ width: "20%", fontWeight: "bold" }}>Gía</label>
+                    <input
+                        type="text"
+                        name="giaBan"
+                        className="border p-2"
+                        style={{ width: "70%", borderRadius: 4 }}
+                        value={formData.giaBan}
+                        onChange={handleChange}
+                        ref={priceRef}
+                    />
                 </div>
-                <input
-                    type="text"
-                    name="giaBan"
-                    className="border p-2 mb-2 w-80"
-                    style={{ width: "80%" }}
-                    value={formData.giaBan}
-                    onChange={handleChange}
-                    ref={priceRef}
-                />
 
-                <div style={{ marginRight: "500px", fontWeight: "bold" }}>
-                    Unit
+                <div style={{ width: "100%", marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <label style={{ width: "20%", fontWeight: "bold" }}>Đơn vị</label>
+                    <input
+                        type="text"
+                        name="donViTinh"
+                        className="border p-2"
+                        style={{ width: "70%", borderRadius: 4 }}
+                        value={formData.donViTinh}
+                        onChange={handleChange}
+                        ref={unitRef}
+                    />
                 </div>
-                <input
-                    type="text"
-                    name="donViTinh"
-                    className="border p-2 mb-4 w-80"
-                    style={{ width: "80%" }}
-                    value={formData.donViTinh}
-                    onChange={handleChange}
-                    ref={unitRef}
-                />
 
-                <div style={{ marginRight: "500px", fontWeight: "bold" }}>
-                    Type
+                <div style={{ width: "100%", marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <label style={{ width: "20%", fontWeight: "bold" }}>Loại</label>
+                    <input
+                        type="text"
+                        name="nhomSanPham"
+                        className="border p-2"
+                        style={{ width: "70%", borderRadius: 4 }}
+                        value={formData.nhomSanPham}
+                        onChange={handleChange}
+                        ref={typeRef}
+                    />
                 </div>
-                <input
-                    type="text"
-                    name="donViTinh"
-                    className="border p-2 mb-4 w-80"
-                    style={{ width: "80%" }}
-                    value={formData.nhomSanPham}
-                    onChange={handleChange}
-                    ref={typeRef}
-                />
 
-                <div style={{ marginRight: "450px", fontWeight: "bold" }}>
-                    Description
+                <div style={{ width: "100%", marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <label style={{ width: "20%", fontWeight: "bold" }}>Mô tả</label>
+                    <input
+                        type="text"
+                        name="moTa"
+                        className="border p-2"
+                        style={{ width: "70%", borderRadius: 4 }}
+                        value={formData.moTa}
+                        onChange={handleChange}
+                        ref={descriptionRef}
+                    />
                 </div>
-                <input
-                    type="text"
-                    name="moTa"
-                    className="border p-2 mb-4 w-80"
-                    style={{ width: "80%" }}
-                    value={formData.moTa}
-                    onChange={handleChange}
-                    ref={descriptionRef}
-                />
 
                 <button
                     style={{
@@ -524,7 +488,7 @@ const FullScreenModal = ({ product, setIsOpen, callApiGetProducts, callApiGetPro
                     }}
                     onClick={() => callApiSaveProduct()}
                 >
-                    Save
+                    Lưu
                 </button>
             </div>
         </div>

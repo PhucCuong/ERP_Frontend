@@ -172,13 +172,14 @@ const Menu = ({ setUserName }) => {
                                 <div
                                     onClick={() => setOpenReportSubmenu(!openReportSubmenu)}
                                     style={{
-                                        padding: '10px 20px',
+                                        backgroundColor: '#3E58CE',
+                                        color: '#ffffff',
                                         cursor: 'pointer',
+                                        fontSize: 18,
                                         display: 'flex',
-                                        alignItems: 'center',
                                         justifyContent: 'space-between',
-                                        backgroundColor: '#4F6BED',
-                                        color: '#fff'
+                                        alignItems: 'center',
+                                        padding: '16px'
                                     }}
                                 >
                                     <span>
@@ -198,7 +199,6 @@ const Menu = ({ setUserName }) => {
                                         {renderNavLink('/reportings/progress', 'Báo cáo tiến độ sản xuất', <BsReception4 />, 'reportings-progress')}
                                         {renderNavLink('/reportings/overview', 'Báo cáo tổng quan sản phẩm', <BsReception4 />, 'reportings-overview')}
                                         {renderNavLink('/reportings/quality', 'Báo cáo chất lượng', <BsReception4 />, 'reportings-quality')}
-                                        {renderNavLink('/reportings/cost', 'Báo cáo chi phí sản xuất', <BsReception4 />, 'reportings-cost')}
                                     </div>
                                 )}
                             </>

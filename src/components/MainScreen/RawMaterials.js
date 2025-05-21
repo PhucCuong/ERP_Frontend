@@ -84,12 +84,12 @@ const RawMaterials = () => {
 
     return (
         <div className='materials-container'>
-            <div className="materials-header">Raw Materials</div>
+            <div className="materials-header">Nguyên vật liệu</div>
             <div className='body'>
                 <div className='materials-list'>
                     <div className='product-title-row'>
-                        <div className='materials-list-title materials-list-title-left'>Materials name</div>
-                        <div className='materials-list-title materials-list-title-right'>Import price</div>
+                        <div className='materials-list-title materials-list-title-left'>Tên nguyên liệu</div>
+                        <div className='materials-list-title materials-list-title-right'>Gía nhập</div>
                     </div>
                     <div className='materials-list-columns'>
                         {
@@ -104,7 +104,7 @@ const RawMaterials = () => {
                 </div>
                 <div className='materials-detail'>
                     <div style={{ fontSize: 26, fontWeight: 'bold', color: '#3E58CE', marginTop: 20 }}>
-                        Form add raw materials
+                        Form Thêm nguyên vật liệu
                     </div>
                     <div style={{
                         display: 'flex',
@@ -143,7 +143,7 @@ const RawMaterials = () => {
                                 <input className='materials-detail-input' ref={statusRef} />
                             </div>
                         </div>
-                        <button className='btn-add' onClick={() => addMaterial()}>Add Material</button>
+                        <button className='btn-add' onClick={() => addMaterial()}>Thêm</button>
                     </div>
                 </div>
             </div>
